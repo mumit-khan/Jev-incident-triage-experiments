@@ -1,0 +1,84 @@
+{
+  "version": "0.1.0",
+  "seed": 20260928,
+  "policy_version": "northstar-1.0",
+  "synthetic": true,
+  "operator": "Northstar Telecom",
+  "splits": {
+    "train": {
+      "records": 600,
+      "independent_scenario_families": 30,
+      "owners": {
+        "core": 120,
+        "transport": 120,
+        "power": 120,
+        "noc": 120,
+        "ran": 120
+      },
+      "priorities": {
+        "P2": 179,
+        "P3": 367,
+        "P1": 14,
+        "P4": 40
+      }
+    },
+    "validation": {
+      "records": 220,
+      "independent_scenario_families": 11,
+      "owners": {
+        "power": 40,
+        "transport": 40,
+        "ran": 40,
+        "noc": 60,
+        "core": 40
+      },
+      "priorities": {
+        "P2": 70,
+        "P3": 120,
+        "P4": 20,
+        "P1": 10
+      }
+    },
+    "test": {
+      "records": 220,
+      "independent_scenario_families": 11,
+      "owners": {
+        "power": 40,
+        "noc": 60,
+        "ran": 40,
+        "core": 40,
+        "transport": 40
+      },
+      "priorities": {
+        "P2": 50,
+        "P3": 134,
+        "P4": 20,
+        "P1": 16
+      }
+    },
+    "challenge": {
+      "records": 24,
+      "independent_scenario_families": 4,
+      "owners": {
+        "noc": 12,
+        "transport": 9,
+        "power": 3
+      },
+      "priorities": {
+        "P4": 6,
+        "P2": 13,
+        "P1": 5
+      }
+    }
+  },
+  "sha256": {
+    "challenge.inputs.jsonl": "0dc3260d64172eb529191addf517f83834ba07b103926247319c3aa5534a1770",
+    "challenge.labels.jsonl": "a321a671ce91e11e2c05b77a600e08a8f70c8ed84c917bad5de04065cc696852",
+    "test.inputs.jsonl": "f4867bc22440414ad2ffe3d54d3d9957fc0cb62d9bd8da4fc2127255dd89e34b",
+    "test.labels.jsonl": "9b7d4e177bbffa7d92061d3b654ded95e54003a68e521c449500616857a44ea8",
+    "train.inputs.jsonl": "777b7cf1460716f663c15aec4c7e57d3f5ea8e26709a9fd5a0a5caec9a3639c1",
+    "train.labels.jsonl": "9882ab495ba1f23e75a6be65340958053e4a9ef0d9c7eafeb0a0683662c40574",
+    "validation.inputs.jsonl": "20fc9bc12f1a29259df9d2518c0c19f63e227c166ec15c3f2d16cb1bc39eb013",
+    "validation.labels.jsonl": "eaf371c921dbeb946b3990c4060c3442e1d5695c6edb0d98d8c81668d73a5938"
+  }
+}
