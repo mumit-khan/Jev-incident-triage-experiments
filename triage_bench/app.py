@@ -12,9 +12,9 @@ from urllib.parse import urlparse, parse_qs
 
 from .dataset import ROOT, read_jsonl, write_jsonl
 from .evaluate import evaluate
-from .runner import run, request_body
+from .runner import run, request_body, clean_api_key
 
-PROVIDERS = ['baseline', 'ml', 'jev']
+PROVIDERS = ['baseline', 'ml', 'ml_structured', 'jev', 'jev_focused']
 SPLITS = ['learning', 'validation', 'test', 'challenge']
 
 
@@ -36,13 +36,17 @@ def load_env(path):
 
 
 def profiles():
-    return {
+    configs = {
         'baseline': dict(model='keyword-baseline', endpoint='', context_tokens=8192,
                          deployment='Local deterministic rules', api_key=''),
         'ml': dict(model='tfidf-logistic-v1', endpoint='', context_tokens=8192,
                    deployment='Local TF-IDF + logistic regression; 600 training incidents / 30 families', api_key=''),
         'jev': dict(model=os.getenv('JEV_MODEL', 'jev-1.13.0'), endpoint=os.getenv('JEV_ENDPOINT', 'https://api.typesafe.ai/v1/systemone'),
                     context_tokens=int(os.getenv('JEV_CONTEXT_TOKENS', '32768')), deployment='Hosted Jev API', api_key=os.getenv('TYPESAFE_API_KEY', ''))}
+    configs['ml_structured'] = dict(model='structured-logistic-v2', endpoint='', context_tokens=8192,
+        deployment='Local word/character TF-IDF + structured impact; same 600 training incidents', api_key='')
+    configs['jev_focused'] = {**configs['jev'], 'deployment': 'Hosted Jev API; compact evidence and explicit questions'}
+    return configs
 
 
 class App:
@@ -51,6 +55,7 @@ class App:
         self.profiles = profiles()
         self.profiles = {p: self.profiles[p] for p in PROVIDERS}
         self.ml_model = None
+        self.structured_ml_model = None
         self.lock = threading.RLock()
         self.jobs = {}
         self.stops = {}
@@ -86,13 +91,12 @@ class App:
             raise ValueError('Supply a model name and a valid context capacity.')
         with self.lock:
             previous = self.profiles[name]
-            key = str(payload.get('api_key','')).strip()
-            if any(ord(c) < 32 for c in key):
-                raise ValueError('API key contains invalid control characters.')
+            key = clean_api_key(payload.get('api_key', ''))
             if not key and endpoint == previous['endpoint'] and not payload.get('clear_key'):
                 key = previous['api_key']
             self.profiles[name] = dict(model=model, endpoint=endpoint, context_tokens=capacity,
                 deployment=str(payload.get('deployment','Unspecified deployment')).strip(), api_key=key)
+            self.profiles['jev_focused'] = {**self.profiles[name], 'deployment': 'Hosted Jev API; compact evidence and explicit questions'}
         return self.config()
 
     def incidents(self, split):
@@ -105,7 +109,9 @@ class App:
             labels = read_jsonl(self.root / 'data' / f'{split}.labels.jsonl')
         keys = {k['id']: k for k in labels}
         return [{'id':r['id'], 'input':r['input'], 'labels':keys[r['id']]['labels'],
+                 'accepted_answers':keys[r['id']]['accepted_answers'],
                  'request':request_body(r,self.profiles['jev']['model']),
+                 'focused_request':request_body(r,self.profiles['jev']['model'], 'focused'),
                  'rationale':keys[r['id']].get('label_rationale',{}),
                  'family':keys[r['id']]['incident_family_id'], 'pair_id':keys[r['id']].get('pair_id')}
                 for r in records]
@@ -162,11 +168,14 @@ class App:
             if any(j['status'] in ['running','queued'] for j in self.jobs.values()):
                 raise ValueError('Another comparison is running. Finish or cancel it first.')
             config = {name:copy.deepcopy(self.profiles[name]) for name in chosen}
-            if 'jev' in chosen and not config['jev']['api_key']:
+            if any(p in chosen and not config[p]['api_key'] for p in ['jev', 'jev_focused']):
                 raise ValueError('Add your Jev API key in Settings first.')
             if 'ml' in chosen and self.ml_model is None:
                 from .ml import IncidentClassifier
                 self.ml_model = IncidentClassifier(self.root)
+            if 'ml_structured' in chosen and self.structured_ml_model is None:
+                from .ml import StructuredIncidentClassifier
+                self.structured_ml_model = StructuredIncidentClassifier(self.root)
             job_id = uuid.uuid4().hex[:16]
             directory = self.run_root / job_id
             directory.mkdir()
@@ -198,8 +207,8 @@ class App:
             output = directory/f'{name}.jsonl'
             try:
                 meta = run(directory/'inputs.jsonl',output,provider=name,stop_event=stop,progress=progress,
-                           timeout=60,ml_model=self.ml_model,**cfg)
-                metrics = evaluate(directory/'labels.jsonl',output,directory/f'{name}.metrics.json')
+                           timeout=60,ml_model=self.structured_ml_model if name == 'ml_structured' else self.ml_model,**cfg)
+                metrics = evaluate(directory/'labels.jsonl',output,directory/f'{name}.metrics.json', inputs_path=directory/'inputs.jsonl')
                 rows = read_jsonl(output)
                 public_rows = [{k:v for k,v in row.items() if k!='raw_response'} for row in rows]
                 result = {'metrics':metrics,'metadata':meta,'predictions':public_rows}

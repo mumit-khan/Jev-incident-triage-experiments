@@ -19,13 +19,15 @@ The app does not download language-model weights or call Jev on startup. The ML 
 
 ## First experiment
 
-1. Select **Learning set** and **ML · logistic regression**. Run the 11 learning cases, one per validation scenario family.
+1. Select **Learning set** and **ML · original**. Run the 11 learning cases, one per validation scenario family.
 2. Choose an incident. Read its full evidence and then reveal **Benchmark reference decisions**. These are authored answers, not model predictions.
 3. Inspect the actual ML decisions and probability distributions. Look at where it chooses the wrong investigating team, misses missing evidence or misreads priority.
 4. Open **Model settings**, enter your own Jev key and save. The key stays in server memory. The default is the pinned `jev-1.13.0` model.
-5. Select **Jev** and **ML**, then run the same cases. Both receive the same policy and incident state. Calls to the hosted API incur your provider's charges.
+5. Select **Jev · original** and **ML · original**, then run the same cases. Both receive the same policy and incident state. Calls to the hosted API incur your provider's charges.
 6. Try **Paired challenge**. A single changed fact can change the correct decision, or should leave it unchanged.
 7. Export JSON to retain predictions, answer probabilities, latency, failures, model version and training fingerprints.
+
+For the current failure-review session, the updated app is running at **http://127.0.0.1:8767/**. It adds **ML · compact + impact features** and **Jev · focused questions**, failure filters, regression review and paired evidence inspection. Read [the measured performance review](docs/performance-review.md) for actual before/after results and remaining gaps.
 
 Read [the learning guide](docs/learning-guide.md) for the questions to ask while comparing results.
 
@@ -39,7 +41,7 @@ Read [the learning guide](docs/learning-guide.md) for the questions to ask while
 
 The four outputs are initial investigating team, fictional policy priority, next diagnostic check and whether evidence is insufficient. This version uses Choice questions for all four outputs to maintain a common comparison contract. It does not demonstrate Score or Noul yet.
 
-The ML text features use the **same exact state string** supplied to Jev. Record IDs, labels and family metadata are excluded. The ML parameters are fixed before validation. Jev is not trained on the telecom labels. Consequently, this compares two approaches to the task, rather than equal training histories. Rules are included to show which parts are better handled by software.
+The ML text features use the **same exact state string** supplied to Jev. Record IDs, labels and family metadata are excluded. The original ML parameters were fixed before validation. The revised representation and focused Jev questions were designed after reviewing original validation failures, then frozen before test and challenge checks. Jev is not trained on the telecom labels. Consequently, this compares two approaches to the task, rather than equal training histories. Rules are included to show which parts are better handled by software.
 
 ## Anomaly detection boundary
 

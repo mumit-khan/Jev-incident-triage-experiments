@@ -14,13 +14,14 @@ def main():
     v = sub.add_parser('validate'); v.add_argument('--data',type=Path,default=ROOT/'data')
     r = sub.add_parser('run')
     r.add_argument('--inputs',required=True,type=Path); r.add_argument('--output',required=True,type=Path)
-    r.add_argument('--provider',choices=['baseline','ml','jev'],default='baseline')
+    r.add_argument('--provider',choices=['baseline','ml','ml_structured','jev','jev_focused'],default='baseline')
     r.add_argument('--model'); r.add_argument('--endpoint'); r.add_argument('--key-env')
     r.add_argument('--limit',type=int); r.add_argument('--timeout',type=float,default=60)
     r.add_argument('--context-tokens',type=int); r.add_argument('--deployment')
     e = sub.add_parser('evaluate')
     e.add_argument('--labels',required=True,type=Path); e.add_argument('--predictions',required=True,type=Path)
     e.add_argument('--output',required=True,type=Path)
+    e.add_argument('--inputs',type=Path,help='Optional inputs for separate software-priority scoring')
     x = sub.add_parser('export-training')
     x.add_argument('--split',choices=['train','validation'],default='train')
     x.add_argument('--data',type=Path,default=ROOT/'data'); x.add_argument('--output',required=True,type=Path)
@@ -29,7 +30,7 @@ def main():
     elif command=='validate': result=validate(args['data'])
     elif command=='run': result=run(**args)
     elif command=='evaluate':
-        result=evaluate(args['labels'],args['predictions'],args['output'])
+        result=evaluate(args['labels'],args['predictions'],args['output'],inputs_path=args['inputs'])
         result={k:v for k,v in result.items() if k!='fields'}
     else:
         records=read_jsonl(args['data']/f'{args["split"]}.inputs.jsonl')

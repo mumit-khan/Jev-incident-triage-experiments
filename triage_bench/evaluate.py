@@ -17,7 +17,7 @@ def quantile(values, fraction):
     return values[min(len(values)-1, math.ceil(len(values)*fraction)-1)]
 
 
-def evaluate(labels_path, predictions_path, output=None):
+def evaluate(labels_path, predictions_path, output=None, inputs_path=None):
     keys, rows = read_jsonl(labels_path), read_jsonl(predictions_path)
     by_id = {r['id']: r for r in rows}
     if len(by_id) != len(rows):
@@ -87,6 +87,18 @@ def evaluate(labels_path, predictions_path, output=None):
                  'error_rate': (sum(1-ok for c,ok in selective if c>=t)/sum(c>=t for c,_ in selective)) if any(c>=t for c,_ in selective) else None}
                 for t in [0,.5,.7,.8,.9,.95,.99]]}
     metrics['all_fields_accuracy'] = sum(all(m.values()) for m in matches.values())/len(keys)
+    semantic_fields = ['initial_owner', 'next_check', 'insufficient_evidence']
+    metrics['semantic_decisions_accuracy'] = sum(all(m[f] for f in semantic_fields) for m in matches.values())/len(keys)
+    if inputs_path:
+        from .policy import priority
+        packets = {r['id']: r['input'] for r in read_jsonl(inputs_path)}
+        if set(packets) != ids:
+            raise ValueError('Scoring inputs must match reference IDs.')
+        metrics['with_software_priority_accuracy'] = sum(
+            all(matches[k['id']][f] for f in semantic_fields)
+            and priority(packets[k['id']]['service_impact']) in k['accepted_answers']['priority']
+            for k in keys) / len(keys)
+        metrics['software_priority_note'] = 'Separate counterfactual score: keep the three model decisions and replace priority using the published policy. Original predictions are unchanged; failed responses remain failures.'
     severe = [k for k in keys if k['labels']['priority']=='P1']
     metrics['p1_miss_rate'] = sum(not matches[k['id']]['priority'] for k in severe)/len(severe) if severe else None
     metrics['p1_records'] = len(severe)
