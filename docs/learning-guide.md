@@ -1,6 +1,6 @@
 # Learning guide
 
-I use the lab to understand how Jev, ML and rules turn incident evidence into four bounded decisions. I start with saved cases, then use local replays or new comparisons to investigate disagreements.
+I use the lab to understand how Jev, ML and rules turn incident evidence into four bounded decisions. Saved cases provide a starting point; local replays and new comparisons help investigate disagreements.
 
 ## Explore the completed study
 
@@ -45,7 +45,7 @@ Start with these cases in [the measured review](performance-review.md):
 - Maintenance scope: impact extends beyond the maintenance assets, so the policy calls for verification before domain assignment.
 - ML regression: a corrected priority can accompany a newly incorrect owner or next check.
 
-Use validation to develop changes. Having inspected the existing test and challenge failures, I will use new development and evaluation families for the next experiment.
+Use validation to develop changes. The existing test and challenge failures have already informed the next experiment, which needs new development and evaluation families.
 
 ## Use the paired challenges and sandbox
 
@@ -71,4 +71,4 @@ If a response fails, inspect its recorded status and settings. The app stops tha
 
 ## Next experiment
 
-I will test explicit dependency coverage and measurement freshness on new families, one input change at a time, then evaluate the frozen revisions on separate families. I will score software priority separately and inspect regressions and high-probability errors. [The overview](experiment-overview.md#next-experiment) records the plan. Raw KPI time-series anomaly detection remains a later, separate experiment.
+I will test explicit dependency coverage and measurement freshness on new families, one input change at a time, then evaluate the frozen revisions on separate families. The comparison will score software priority separately and include a review of regressions and high-probability errors. [The overview](experiment-overview.md#next-experiment) records the plan. Raw KPI time-series anomaly detection remains a later, separate experiment.

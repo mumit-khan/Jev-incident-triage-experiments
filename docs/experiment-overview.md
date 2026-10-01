@@ -2,11 +2,11 @@
 
 ## Purpose
 
-I am testing how Jev, a conventional machine learning (ML) classifier and simple rules support telecom incident decisions. I want to identify their failures and test whether better inputs, clearer questions or software calculations improve their decisions.
+I am testing how Jev, a conventional machine learning (ML) classifier and simple rules support telecom incident decisions, and whether better inputs, clearer questions or software calculations address their failures.
 
-I start with incident interpretation and the next diagnostic step, as preparation for workflows such as a RAN KPI analyzer or an intelligent field services agent. The lab uses the fictional Northstar Telecom network and recommends diagnostics without executing network changes. It interprets KPI anomalies described in incident summaries; raw time-series anomaly detection is a separate experiment.
+The study starts with incident interpretation and the next diagnostic step, as preparation for workflows such as a RAN KPI analyzer or an intelligent field services agent. The lab uses the fictional Northstar Telecom network and recommends diagnostics without executing network changes. It interprets KPI anomalies described in incident summaries; raw time-series anomaly detection is a separate experiment.
 
-I ask each approach to make four decisions:
+Each approach makes four decisions:
 
 | Decision | Meaning |
 |---|---|
@@ -17,7 +17,7 @@ I ask each approach to make four decisions:
 
 ### Policy example
 
-I wrote the policy to define the decisions and the evidence they require. It tells the approaches to:
+The policy defines the decisions and the evidence they require. It tells the approaches to:
 
 - Select an initial investigating team without claiming a confirmed root cause.
 - Keep missing, stale or conflicting evidence with NOC. Gather current evidence, unless verifying a relevant change scope is the immediate next step.
@@ -28,15 +28,15 @@ For example, fresh evidence of scheduler task stalls at one degraded site suppor
 
 ## Synthetic data
 
-### How I created it
+### Data construction
 
-I used AI assistance to write fictional incident scenarios and their expected decisions. “Authored” means I defined the observations, service impact, investigating team, next check and evidence sufficiency for each scenario. I did not derive these scenarios or answer keys from real incident records.
+I wrote fictional incident scenarios and their expected decisions with AI assistance. “Authored” means written for this study: observations and service impact form the evidence; investigating team, next check and evidence sufficiency form the reference decisions. Neither the scenarios nor the answer keys come from real incident records.
 
-For the radio scheduler scenario, I specified elevated scheduling delay, low resource occupancy, repeated task stalls and a healthy uplink. I set RAN as the initial owner and radio inspection as the next check. Those choices form the reference against which I score the approaches.
+For example, the radio scheduler scenario describes elevated scheduling delay, low resource occupancy, repeated task stalls and a healthy uplink. Its reference assigns RAN as the initial owner and radio inspection as the next check. The evaluation scores each approach against those choices.
 
 A deterministic generator expands each regular scenario into 20 packets. It varies dates, identifiers, affected-site counts and presentation details while generally retaining the central evidence wording. It calculates priority from the fictional policy.
 
-Each packet includes observations, report timestamps, impact, an illustrative topology and change information. I keep the answer keys, rationales and family identifiers in separate files and exclude them from model requests. The observations are narrative summaries, not simulated network measurements.
+Each packet includes observations, report timestamps, impact, an illustrative topology and change information. Separate files hold the answer keys, rationales and family identifiers; model requests exclude them. The observations are narrative summaries, not simulated network measurements.
 
 ### What a family means
 
@@ -56,11 +56,11 @@ These are related examples, not 20 independent failure modes. A perfect family s
 
 The **learning set** is a teaching view of validation, not an additional independent evaluation set.
 
-**Held-out** means kept out of training and tuning. I fit ML only on training records, use validation to choose changes, then freeze those changes before test evaluation. Regular training, validation and test families do not overlap, although some policy language and network structures recur.
+**Held-out** means kept out of training and tuning. ML fits only training records. Validation guides changes, which stay frozen during test evaluation. Regular training, validation and test families do not overlap, although some policy language and network structures recur.
 
-Five test records and four challenge records had appeared in earlier runs. The full evaluations therefore check the frozen revisions but do not constitute an entirely untouched benchmark. Having examined their failures, I will use new evaluation cases for the next improvement round.
+Five test records and four challenge records had appeared in earlier runs. The full evaluations therefore check the frozen revisions but do not constitute an entirely untouched benchmark. Those failures now inform the next improvement round, which needs new evaluation cases.
 
-A **paired challenge** changes one controlled factor. I check whether the decisions change appropriately or stay stable when the added information is irrelevant.
+A **paired challenge** changes one controlled factor and tests whether decisions change appropriately or stay stable when the added information is irrelevant.
 
 | Controlled change | Expected behavior |
 |---|---|
@@ -73,39 +73,39 @@ Each type has three pairs. The 24 records cover four challenge types, not 24 ind
 
 ### Is it representative of a real network?
 
-**I designed teaching data around telecom incident themes. I have not established that it represents a real network.** The scenarios cover radio, transport, power, core services, maintenance and recovery. I chose their mix to exercise decisions, not to match observed incident frequencies.
+**This is teaching data built around telecom incident themes. I have not established that it represents a real network.** The scenarios cover radio, transport, power, core services, maintenance and recovery. I chose their mix to exercise decisions, not to match observed incident frequencies.
 
-I did not calibrate the generated counts, simplified topologies or clean summaries against network telemetry. They do not reproduce a measured mix of equipment, traffic, alarm bursts, delayed reports, incomplete notes or competing diagnoses. A telecom specialist has not validated the scenarios, policy or answer keys.
+The generated counts, simplified topologies and clean summaries lack calibration against network telemetry. They do not reproduce a measured mix of equipment, traffic, alarm bursts, delayed reports, incomplete notes or competing diagnoses. A telecom specialist has not validated the scenarios, policy or answer keys.
 
-The dataset lets me inspect policy application and failures under controlled changes. Its scores do not estimate performance on real incidents. That will require specialist review and evaluation on independently labeled, anonymized incidents using the evidence available at each decision time.
+The dataset supports inspection of policy application and failures under controlled changes. Its scores do not estimate performance on real incidents. That will require specialist review and evaluation on independently labeled, anonymized incidents using the evidence available at each decision time.
 
 ## First experiment: establish the comparison
 
-I compared three approaches on the same incident evidence and candidate decisions.
+The first experiment compared three approaches on the same incident evidence and candidate decisions.
 
 ### Jev
 
-I used hosted `jev-1.13.0` through the TypeSafe API. Each request contained a **state**, consisting of the policy and full incident packet, and four **Choice** questions with fixed options and descriptions. Jev returned its decisions, answer probabilities and a separate confidence value. The request format follows the [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart).
+Hosted `jev-1.13.0` received requests through the TypeSafe API. Each request contained a **state**, consisting of the policy and full incident packet, and four **Choice** questions with fixed options and descriptions. Jev returned its decisions, answer probabilities and a separate confidence value. The request format follows the [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart).
 
-I did not train or fine-tune Jev on the telecom labels.
+Jev received policy and evidence at inference time, without training or fine-tuning on the telecom labels.
 
 ### Rules
 
-I built keyword rules for power, core, transport and RAN, with explicit handling for selected missing-evidence, maintenance and recovery phrases. I calculated priority directly from impact status and site count.
+Keyword rules routed cases to power, core, transport and RAN, with explicit handling for selected missing-evidence, maintenance and recovery phrases. A separate rule calculated priority directly from impact status and site count.
 
 The rules provided a comparison point for how much straightforward software could solve. They did not learn from examples or analyze full dependency paths.
 
 ### ML
 
-I used scikit-learn to convert the same policy-and-incident state sent to Jev into TF-IDF features for individual words and two-word sequences. TF-IDF represents text numerically and weights terms that distinguish documents. See [scikit-learn’s text feature documentation](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction).
+Scikit-learn converted the same policy-and-incident state sent to Jev into TF-IDF features for individual words and two-word sequences. TF-IDF represents text numerically and weights terms that distinguish documents. See [scikit-learn’s text feature documentation](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction).
 
-I trained four logistic regression classifiers, one per decision, on the 600 training records. I fixed their settings before validation and fitted both the vocabulary and classifiers only on training data.
+Four logistic regression classifiers, one per decision, learned from the 600 training records. I fixed their settings before validation; vocabulary and classifier fitting used only training data.
 
 ML learned the fictional task from labeled examples. Jev used an existing model with supplied policy and instructions, so the comparison does not assume equivalent training histories.
 
 ### Initial results
 
-I started with the learning cases, then reviewed full validation. A record passes only when all four decisions match the accepted references. Failed or missing responses count as errors.
+The initial evaluation covered the learning cases, then full validation. A record passes only when all four decisions match the accepted references. Failed or missing responses count as errors.
 
 | Original approach | All four decisions correct: 220 validation records | Failed responses |
 |---|---:|---:|
@@ -115,15 +115,15 @@ I started with the learning cases, then reviewed full validation. A record passe
 
 ML chose the correct owner on every validation record but often missed priority and the maintenance-scope diagnostic. Jev also missed priority and sometimes requested more evidence despite a directly observed domain malfunction.
 
-The app rejected five Jev responses because their probability distributions did not sum to one within its original tolerance. I counted those response-handling failures in the score.
+The app rejected five Jev responses because their probability distributions did not sum to one within its original tolerance. Those response-handling failures count against the score.
 
 ## Second experiment: improve the inputs and questions
 
-I used the validation failures to revise Jev’s requests and ML’s features. I kept the dataset, policy, reference answers and Jev checkpoint unchanged, and continued fitting ML only on the original training data.
+Validation failures guided revisions to Jev’s requests and ML’s features. I kept the dataset, policy, reference answers and Jev checkpoint unchanged. ML fitting continued to use only the original training data.
 
 ### Jev input before and after
 
-For scheduler case `NS-b073aba91088`, I removed the duplicate ticket description and operator note. I retained observations, impact, topology and change information, and added derived impact bands and report age.
+For scheduler case `NS-b073aba91088`, the compact request removed the duplicate ticket description and operator note, retained observations, impact, topology and change information, and added derived impact bands and report age.
 
 These excerpts show the actual impact and observation fields. Both complete requests also contained the same policy text, topology and change record.
 
@@ -165,9 +165,9 @@ These excerpts show the actual impact and observation fields. Both complete requ
 }
 ```
 
-I derived the band and report age from existing counts and timestamps; the observation stayed the same. I did not supply any reference answers in the request. The revised state also explains that report age can differ from measurement age and that inventory alone does not prove a fault.
+The transformation calculated the band and report age from existing counts and timestamps; the observation stayed the same. I did not supply any reference answers in the request. The revised state also explains that report age can differ from measurement age and that inventory alone does not prove a fault.
 
-I changed the questions and option descriptions. The following are excerpts from the actual instructions:
+The revised questions and option descriptions made the decision criteria explicit. These excerpts show the actual instructions:
 
 | Input | Original | Revised |
 |---|---|---|
@@ -176,7 +176,7 @@ I changed the questions and option descriptions. The following are excerpts from
 | Evidence instruction | Is evidence insufficient to select a unique investigating fault domain, using the policy definition? | Is current evidence insufficient to choose an initial investigating domain under the policy? Unknown exact root cause is NOT enough for yes. A directly observed domain malfunction is sufficient for no. |
 | RAN option | Radio access: radio resource, interference, antenna, timing or mobility evidence. | Observed radio-access performance or hardware malfunction: scheduling, RF reception, antenna, interference, timing or mobility. |
 
-I also clarified the NOC option and when to verify a change, gather evidence or monitor recovery. In the walkthrough, **What changed** compares the packets and questions and exposes each complete request. In the comparison lab, **What Jev receives → Request version** shows the same variants.
+The revised instructions also clarified the NOC option and when to verify a change, gather evidence or monitor recovery. In the walkthrough, **What changed** compares the packets and questions and exposes each complete request. In the comparison lab, **What Jev receives → Request version** shows the same variants.
 
 | Saved response for this case | Owner | Priority | Next check | Insufficient evidence |
 |---|---|---|---|---|
@@ -184,13 +184,13 @@ I also clarified the NOC option and when to verify a change, gather evidence or 
 | Jev · focused | `ran` | `P3` | `inspect_radio` | `no` |
 | Reference | `ran` | `P3` | `inspect_radio` | `no` |
 
-The original priority conflicted with the stated impact: one degraded site requires P3. The revised request made that mapping explicit. The original owner and diagnostic also conflicted with the directly observed scheduler malfunction. I named scheduling in the RAN option and explained that initial investigation does not require a proven root cause.
+The original priority conflicted with the stated impact: one degraded site requires P3. The revised request made that mapping explicit. The original owner and diagnostic also conflicted with the directly observed scheduler malfunction. The RAN option now names scheduling, and the owner instruction explains that initial investigation does not require a proven root cause.
 
-I changed the state, questions and option descriptions together. This result establishes the combined improvement on this case, not the contribution of each individual change.
+The experiment changed the state, questions and option descriptions together. This result establishes their combined improvement on this case, not the contribution of each individual change.
 
 ### How to identify the next Jev transformation
 
-Start with the incorrect decision, read its policy rule and trace that rule to the input fields. Then I will check whether the request omits useful evidence, repeats it, requires a calculation or leaves the decision definition ambiguous.
+Start with the incorrect decision, read its policy rule and trace that rule to the input fields. Then check whether the request omits useful evidence, repeats it, requires a calculation or leaves the decision definition ambiguous.
 
 | What to look for | Transformation to test | Status |
 |---|---|---|
@@ -207,13 +207,13 @@ Use the cases already reviewed to develop improvements. Then keep the revised in
 
 ### ML and response handling
 
-I gave revised ML the same compact state as focused Jev. I added short character sequences and structured features for impact status, site-count band and their combination. I trained priority on those impact features alone and the other three decisions on text and structured features. Priority remained a learned classifier result.
+Revised ML received the same compact state as focused Jev, with added short character sequences and structured features for impact status, site-count band and their combination. The priority classifier learned from those impact features alone; the other three classifiers learned from text and structured features. Priority remained a learned classifier result.
 
-The rules stayed unchanged. I also scored each model **with software priority**: retain its three contextual decisions and substitute the exact priority calculation, without overwriting its saved predictions.
+The rules stayed unchanged. A separate score, **with software priority**, retained each model’s three contextual decisions and substituted the exact priority calculation, without overwriting its saved predictions.
 
-I updated response handling to normalize only bounded rounding differences in two-decimal probabilities, including observed totals of 0.99, while retaining raw values. Larger or otherwise malformed distributions still fail. This fixes response handling, not selected decisions.
+The updated response handler normalizes only bounded rounding differences in two-decimal probabilities, including observed totals of 0.99, while retaining raw values. Larger or otherwise malformed distributions still fail. This fixes response handling, not selected decisions.
 
-I froze the revisions after validation review and ran all five approaches on validation, test and challenge. I reran the originals with the same updated response handler used for focused Jev.
+After validation review, I froze the revisions for the full comparison of all five approaches on validation, test and challenge. Reruns of the originals used the same updated response handler as focused Jev.
 
 ## Results
 
@@ -233,27 +233,27 @@ Revised ML passed 213 of 220 test records; focused Jev passed 200. Jev’s perfe
 
 **Priority accounts for much of the gain.** Software priority raises original ML’s test score from 59.5% to 79.1% and original Jev’s from 57.7% to 90.9%. Focused Jev also scores 90.9%, so its revision did not improve aggregate correctness of the other three test decisions. It did improve those decisions on validation and challenge.
 
-**ML’s overall improvement includes regressions.** Validation owner accuracy fell from 100.0% to 86.4%. In some transport cases, revised ML fixed priority but changed a correct owner to power. Original ML with software priority beat revised ML on validation, 90.9% versus 86.4%, but that ordering reversed on test. I introduced several ML changes together and cannot attribute each gain or regression to a single feature change.
+**ML’s overall improvement includes regressions.** Validation owner accuracy fell from 100.0% to 86.4%. In some transport cases, revised ML fixed priority but changed a correct owner to power. Original ML with software priority beat revised ML on validation, 90.9% versus 86.4%, but that ordering reversed on test. Because the experiment combined several ML changes, the results cannot attribute each gain or regression to a single feature change.
 
 **Some diagnostic references need review.** Revised ML still misses maintenance scope and some return-path transport cases. Focused Jev chooses `verify_change` rather than the reference `inspect_radio` on all 20 test variations involving a new neighbor relation, while getting owner, priority and evidence sufficiency right. I will ask a telecom specialist whether the reference should accept an alternative before defining the next evaluation set.
 
 **Dependency reasoning remains weak.** Focused Jev assigns transport on three challenge variations after affected sites stop depending on the faulty uplink. On one case, it assigns 99% probability to that wrong owner. Revised ML also fails this challenge. High answer probability does not establish operational reliability.
 
-The rules scores show how much of these written scenarios keywords and explicit policy can solve. I will use the results to choose further tests, not to estimate production accuracy, restoration-time savings or a generally superior model.
+The rules scores show how much of these written scenarios keywords and explicit policy can solve. These results guide further tests; they do not estimate production accuracy, restoration-time savings or establish a generally superior model.
 
 ## Next experiment
 
 I will test whether explicit dependency facts and measurement freshness reduce unsupported owner assignments and improve requests for evidence.
 
-I will write fresh scenarios with independent network layouts, related and unrelated alarms, current and stale measurements, missing topology, conflicting evidence and irrelevant changes. I will keep the existing results unchanged and obtain specialist review of ambiguous diagnostic references before freezing the new answer keys.
+The new scenarios will cover independent network layouts, related and unrelated alarms, current and stale measurements, missing topology, conflicting evidence and irrelevant changes. Network specialists will review ambiguous diagnostic references before I freeze the new answer keys. The existing results will remain unchanged.
 
-I will compare the frozen revised approaches with versions that add dependency facts, measurement-age facts, or both. I will retain all four model outputs and score software-calculated priority separately. Jev and ML will still choose the investigating team, diagnostic and evidence disposition.
+The comparison will test the frozen revised approaches against versions that add dependency facts, measurement-age facts, or both, retaining all four model outputs and scoring software-calculated priority separately. Jev and ML will still choose the investigating team, diagnostic and evidence disposition.
 
-I will fit new ML features only on the new training split, choose changes on new validation families and evaluate on separate test families. Controlled pairs will test appropriate decision changes and stability when added information is irrelevant.
+The ML models will train only on the new training split. New validation families will guide the changes; separate test families will provide the final evaluation. Controlled pairs will test whether decisions change when relevant facts change and stay stable when added information is irrelevant.
 
-I will measure owner, diagnostic and evidence accuracy; both-record pair accuracy; high-probability errors; and how often the system retains NOC ownership to gather evidence. Improvement must reduce unsupported assignments without losing correct decisions elsewhere. The results will determine whether to proceed to read-only diagnostic tools.
+The evaluation will measure owner, diagnostic and evidence accuracy; both-record pair accuracy; high-probability errors; and how often the system retains NOC ownership to gather evidence. Improvement must reduce unsupported assignments without losing correct decisions elsewhere. The results will determine whether to proceed to read-only diagnostic tools.
 
-I will evaluate raw KPI anomaly detection separately, measuring detection quality and false alarms before testing Jev’s interpretation of the detected evidence.
+Raw KPI anomaly detection will remain a separate experiment. That work will measure detection quality and false alarms before testing Jev’s interpretation of the detected evidence.
 
 ## Evidence
 
@@ -270,6 +270,6 @@ The [failure review](performance-review.md) includes individual cases and input 
 
 ## Interactive inspection
 
-I built the study walkthrough into the comparison app. Its eight chapters connect the data, methods, transformations and saved results. The case workbench follows **Evidence**, **Decisions** and **Inside an approach**, with **Paired change** for controlled comparisons. The local sandbox shows before/after choices without changing the original packet or recorded results.
+The comparison app includes a study walkthrough whose eight chapters connect the data, methods, transformations and saved results. The case workbench follows **Evidence**, **Decisions** and **Inside an approach**, with **Paired change** for controlled comparisons. The local sandbox shows before/after choices without changing the original packet or recorded results.
 
 [The walkthrough guide](observatory.md) explains the controls. Historical run files remain local and ignored by Git; a fresh clone can inspect the data and local models but needs those files to display the historical comparisons. [Verification](verification.md) records the current checks.

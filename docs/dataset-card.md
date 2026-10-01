@@ -2,7 +2,7 @@
 
 ## Origin and use
 
-I constructed this synthetic dataset for the fictional Northstar Telecom operator. No private tickets, infrastructure inventory, or operator procedures were used. I used AI assistance to write scenarios and reference decisions. Deterministic Python expands each regular scenario into 20 variations. “Authored” means written for this study, not drawn from real incident records. No domain specialist has certified the labels.
+I constructed this synthetic dataset for the fictional Northstar Telecom operator, using AI assistance to write scenarios and reference decisions. The dataset contains no private tickets, infrastructure inventory or operator procedures. Deterministic Python expands each regular scenario into 20 variations. “Authored” means written for this study, not drawn from real incident records. No domain specialist has certified the labels.
 
 Use this release to develop adapters, test scoring, inspect failure modes, and pilot supervised training. Do not treat results as an estimate of real incident prevalence, production confidence calibration, or operational savings.
 

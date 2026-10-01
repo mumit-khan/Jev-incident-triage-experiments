@@ -21,7 +21,7 @@ Run the checks in [the README](../README.md#checks). Two Python tests require lo
 
 ## Browser review
 
-I reviewed all eight walkthrough chapters at wide, tablet and phone widths, including a 390-pixel viewport. The pages did not spill horizontally; wide comparison tables scroll within their containers. I checked the comparison lab, its connection to the walkthrough and the settings dialog. Browser error logs were empty.
+The browser review covered all eight walkthrough chapters at wide, tablet and phone widths, including a 390-pixel viewport. Checks also covered the comparison lab, its connection to the walkthrough and the settings dialog. The pages did not spill horizontally; wide comparison tables scroll within their containers. Browser error logs were empty.
 
 The reviewed flows include:
 
@@ -37,7 +37,7 @@ The reviewed flows include:
 
 ## Experiment integrity
 
-The four inference files still match `runs/performance-freeze.json`: `experiments.py`, `ml.py`, `runner.py` and `policy.py`. The walkthrough and UX work did not change the frozen dataset, reference answers, predictions or inference behavior. I did not make hosted Jev calls while building or checking those interfaces.
+The four inference files still match `runs/performance-freeze.json`: `experiments.py`, `ml.py`, `runner.py` and `policy.py`. The walkthrough and UX work did not change the frozen dataset, reference answers, predictions or inference behavior. Interface work and checks ran locally without hosted Jev calls.
 
 The experiment 2 validation, test and challenge runs completed with zero failed or missing responses. The first experiment's validation run had five response-validation failures, which count against its score. These were probability-format failures, not evidence of a selected decision's quality.
 

@@ -1,6 +1,6 @@
 # Northstar Telecom: measured failure review
 
-September 30, 2026. I recorded these predictions on constructed teaching incidents. The scores measure agreement with the synthetic policy; they do not establish operational accuracy, savings or readiness for automation. This report covers experiment 2; the experiment 1 results appear in [the overview](experiment-overview.md#initial-results).
+September 30, 2026. The recorded predictions cover constructed teaching incidents. The scores measure agreement with the synthetic policy; they do not establish operational accuracy, savings or readiness for automation. This report covers experiment 2; the experiment 1 results appear in [the overview](experiment-overview.md#initial-results).
 
 ## What improved
 
@@ -93,7 +93,7 @@ This case is selected because revised ML changes a correct original owner or dia
 
 ## Remaining failures and the next experiment
 
-I will start with dependency coverage and measurement freshness on new development families, then evaluate the frozen changes on separate families. The other rows identify training or reference-review work to consider later. See [the next experiment](experiment-overview.md#next-experiment).
+The next experiment will test dependency coverage and measurement freshness on new development families, then evaluate the frozen changes on separate families. The other rows identify training or reference-review work to consider later. See [the next experiment](experiment-overview.md#next-experiment).
 
 | Observed gap | Measured evidence | Further test, not yet validated |
 |---|---|---|

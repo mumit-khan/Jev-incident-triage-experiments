@@ -1,6 +1,6 @@
 # Sample synthetic incidents
 
-I show observation excerpts from the frozen inputs and their separate reference decisions. These are initial-investigation references, not model predictions or confirmed root causes. Counts and priority belong to the selected packet; other variations can differ.
+These examples pair observation excerpts from the frozen inputs with their separate reference decisions. The references describe initial investigation, not model predictions or confirmed root causes. Counts and priority belong to the selected packet; other variations can differ.
 
 ## Power Fuse
 

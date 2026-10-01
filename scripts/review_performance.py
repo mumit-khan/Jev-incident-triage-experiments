@@ -15,7 +15,7 @@ jobs = {s: json.loads((ROOT / f'runs/app/{id}/job.json').read_text()) for s, id 
 for job in jobs.values():
     if job['status'] != 'completed':
         raise ValueError('Review requires completed comparisons.')
-lines = ['# Northstar Telecom: measured failure review', '', 'September 30, 2026. I recorded these predictions on constructed teaching incidents. The scores measure agreement with the synthetic policy; they do not establish operational accuracy, savings or readiness for automation. This report covers experiment 2; the experiment 1 results appear in [the overview](experiment-overview.md#initial-results).', '',
+lines = ['# Northstar Telecom: measured failure review', '', 'September 30, 2026. The recorded predictions cover constructed teaching incidents. The scores measure agreement with the synthetic policy; they do not establish operational accuracy, savings or readiness for automation. This report covers experiment 2; the experiment 1 results appear in [the overview](experiment-overview.md#initial-results).', '',
 '## What improved', '', 'All four decisions must match an accepted reference: initial owner, priority, next diagnostic and insufficient evidence. Failed or missing responses count as errors.', '',
 '| Approach | Validation: 220 records | Test: 220 records | Challenge: 24 records | Both challenge records correct: 12 pairs |', '|---|---:|---:|---:|---:|']
 for p in NAMES:
@@ -51,7 +51,7 @@ for family, title, description in cases:
     ref = keys[chosen]['labels']
     lines += ['| Reference | '+' | '.join(ref[f] for f in ['initial_owner','priority','next_check','insufficient_evidence'])+' |', '']
 lines += ['## Remaining failures and the next experiment', '',
-'I will start with dependency coverage and measurement freshness on new development families, then evaluate the frozen changes on separate families. The other rows identify training or reference-review work to consider later. See [the next experiment](experiment-overview.md#next-experiment).', '', '| Observed gap | Measured evidence | Further test, not yet validated |', '|---|---|---|',
+'The next experiment will test dependency coverage and measurement freshness on new development families, then evaluate the frozen changes on separate families. The other rows identify training or reference-review work to consider later. See [the next experiment](experiment-overview.md#next-experiment).', '', '| Observed gap | Measured evidence | Further test, not yet validated |', '|---|---|---|',
 '| ML maintenance scope | All 20 validation variations still miss the next diagnostic and evidence decision; revised ML also changes the owner incorrectly. | Add independently written training examples for scope mismatch, fully explained maintenance and directly observed faults after changes. Evaluate on new scenario families. |',
 '| ML direction of transport failure | Revised ML misses the next diagnostic in 7 test variations and owner in 6. | Add contrastive training examples separating a faulty return path from healthy radio and outbound paths; isolate structured impact from semantic feature changes in an ablation. |',
 '| Jev diagnostic after a new neighbor relation | All 20 test variations select verify_change instead of the reference inspect_radio, while owner, priority and evidence decisions are correct. | Clarify the policy for a supported domain after a change. Have a domain reviewer assess whether verify_change should also be accepted before designing fresh evaluation cases. |',

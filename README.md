@@ -1,6 +1,6 @@
 # Jev incident triage experiments
 
-I compare Jev, trained machine learning (ML) and rules on incident decisions for **Northstar Telecom**, a fictional network. I inspect failures, test changes to inputs and questions, and keep the measured results available for review.
+I compare Jev, trained machine learning (ML) and rules on incident decisions for **Northstar Telecom**, a fictional network. The lab exposes failures, compares changes to inputs and questions, and keeps measured results available for review.
 
 The lab recommends diagnostics. It does not execute network changes. The data consists of constructed teaching scenarios; scores do not establish performance on a real network. Raw KPI time-series anomaly detection remains a separate future experiment.
 
