@@ -53,3 +53,5 @@ The checks establish the behavior of this teaching tool. They do not certify sce
 ## Historical evidence release
 
 The `study-evidence-v1` release provides the four documented synthetic runs and freeze record as an archive outside Git history. Its manifest binds the evidence to a source commit, dataset fingerprints and per-file checksums. Metadata paths become repository-relative; prediction rows and returned responses remain unchanged. [The bundle guide](run-bundle.md) explains restoration, and [HANDOFF.md](../HANDOFF.md) describes the next task.
+
+A fresh local clone restored the archive and passed all 45 Python tests without skips. Rebuilding the measured review from those restored runs reproduced the committed report exactly. Restoration did not require a Jev key or make hosted calls.

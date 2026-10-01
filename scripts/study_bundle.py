@@ -150,7 +150,10 @@ def create(archive, root=ROOT):
             review(value, secrets)
             data = (json.dumps(value, indent=2, ensure_ascii=False) + '\n').encode()
         payload[name] = data
-    payload['RESTORE.md'] = (root / 'docs/run-bundle.md').read_bytes()
+    guide = (root / 'docs/run-bundle.md').read_text()
+    for name in ['README.md', 'HANDOFF.md']:
+        guide = guide.replace('(../' + name, f'(https://github.com/mumit/Jev-incident-triage-experiments/blob/{commit}/' + name)
+    payload['RESTORE.md'] = guide.encode()
     review(payload['RESTORE.md'].decode(), secrets)
     dataset = json.loads((root / 'data/manifest.json').read_text())
     manifest = {'schema_version': 1, 'bundle_version': 'study-evidence-v1',
@@ -159,7 +162,8 @@ def create(archive, root=ROOT):
                 'operator': 'Northstar Telecom', 'runs': RUNS,
                 'dataset_sha256': dataset['sha256'],
                 'transformations': ['input_file metadata paths rewritten relative to the repository',
-                                    'JSON metadata formatting normalized; prediction rows and responses unchanged'],
+                                    'JSON metadata formatting normalized; prediction rows and responses unchanged',
+                                    'Restoration guide links point to the matching source commit'],
                 'review': 'Selected study files only; credential fields, known local secrets, token patterns, personal paths and excluded operator identities checked.',
                 'files': {name: {'sha256': sha(data), 'bytes': len(data)} for name, data in payload.items()}}
     review(manifest, secrets)
