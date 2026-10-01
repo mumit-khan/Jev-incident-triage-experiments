@@ -39,6 +39,7 @@ Start with [HANDOFF.md](HANDOFF.md) for the current state, experimental controls
 | [Samples](docs/samples.md) | Input excerpts and separate reference decisions. |
 | [Run bundle](docs/run-bundle.md) | Download, verify and restore historical study evidence. |
 | [Verification](docs/verification.md) | Current tests, browser checks and publication limits. |
+| [Hosting on Gizmos](docs/gizmos.md) | The hosted app and frozen doc on Gizmos, how they run and how to deploy them. |
 
 Choose **Read study** for the formatted experiment overview at `/study`, with section navigation, expandable tables, copyable code and links into case inspection. **Return to walkthrough** restores the selected packet, approach, field and chapter. **Download Markdown** keeps the source available for editors. The page reads the Markdown on each request.
 
