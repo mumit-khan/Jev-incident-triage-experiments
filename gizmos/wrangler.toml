@@ -1,0 +1,10 @@
+name = "jev-triage-experiments-app"
+main = "worker.js"
+
+[[gizmos_containers]]
+binding = "RUNNER"
+description = "Runs the Python triage lab, one container per viewer"
+
+# Comparison runs made in the container survive container restarts here.
+[[r2_buckets]]
+binding = "RUNS"
