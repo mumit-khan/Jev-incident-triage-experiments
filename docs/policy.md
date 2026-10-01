@@ -34,3 +34,11 @@ Select the initial investigating domain, not a confirmed root cause. Use current
 
 - `yes`: A unique investigating fault domain cannot be justified yet.
 - `no`: Evidence supports an initial domain or an explicit monitor-only disposition.
+
+## Policy use in the experiments
+
+Both experiments use this unchanged policy (`northstar-1.0`) and the same reference answers. Focused Jev questions clarify how to apply it; they do not authorize additional actions. Rules calculate priority exactly. Original ML learns all four outputs from text; revised ML learns priority from structured impact features. **With software priority** reports the exact calculation separately without replacing saved predictions.
+
+The overview asks “Is the evidence sufficient?”; the actual output field is `insufficient_evidence`. A value of `yes` means evidence is insufficient. Unknown root cause alone does not make evidence insufficient when a current domain malfunction supports initial investigation.
+
+See [the experiment overview](experiment-overview.md) for a policy example and [the evaluation plan](evaluation-plan.md) for scoring.

@@ -1,34 +1,51 @@
 # Evaluation plan
 
-This plan covers the Jev, trained ML and rules comparison. Saved app runs contain measured predictions and field metrics. Jev results remain empty until real API calls complete. No operational benefit is measured.
+I compare four incident decisions under the [fictional policy](policy.md). [The measured review](performance-review.md) records the completed experiment 2 runs. This plan separates implemented scoring from future work.
 
-## Shared task
+## Task and inputs
 
-Give each model identical visible evidence, a versioned benchmark policy, and the same candidate decisions. Preserve equivalent question semantics when adapting API formats. Record any input truncation, unsupported output, timeout, or adapter failure.
+The outputs are `initial_owner`, `priority`, `next_check` and `insufficient_evidence`. Correctness uses the accepted answers in the separate key. Selecting an initial team does not establish a root cause or authorize a network change.
 
-## Metrics
+In experiment 1, original ML and original Jev receive the same allowlisted policy-and-incident state. In experiment 2, revised ML and focused Jev receive the same compact state. Revised ML also derives structured impact features from that state; focused Jev receives more explicit questions. Rules read observations and impact. No approach receives reference labels, family IDs or generation metadata during inference.
 
-- Initial-owner accuracy and macro-F1.
-- Priority confusion matrix and severe-incident miss rate under the fictional policy.
-- Accepted diagnostic-step accuracy, allowing explicitly recorded alternatives.
-- Insufficient-evidence accuracy, macro-F1 and confusion matrix.
-- Calibration using Brier score and reliability plots for supported probability outputs.
-- Error versus automation coverage after selecting model-specific thresholds on validation data.
-- Median and p95 per-incident latency, and failed/missing request counts.
-- Jev's returned token usage per call. Cost estimates and throughput experiments are future work.
+I fit each ML vocabulary and classifier only on the 600 training records. Jev uses the fixed hosted checkpoint `jev-1.13.0`; I did not fine-tune it on telecom examples. These approaches have different training histories.
 
-Define whether each probability is over candidate answers or represents a separate confidence estimate. Do not treat all exposed confidence fields as interchangeable or invent probabilities for models that do not return them.
+## Implemented scores
 
-## Experimental controls
+| Measure | Definition |
+|---|---|
+| All four decisions correct | Every field matches an accepted reference. Failed and missing responses count as failures. |
+| Three semantic decisions | Owner, next check and evidence sufficiency match; priority is excluded. |
+| With software priority | The three model decisions match, and the separately calculated policy priority matches. Failed responses remain failures; saved predictions stay unchanged. |
+| Field accuracy and macro-F1 | Each decision is scored separately, with confusion matrices and error entries. |
+| P1 miss rate | Incorrect priority among P1 reference packets. Undefined when the set has no P1 cases. |
+| Both packets correct | Every decision matches on both sides of each challenge pair. |
+| Brier score and reliability bins | Candidate-answer probabilities are compared with a unique reference. Brier scoring skips fields with multiple accepted answers. |
+| Coverage curves | Error and fraction retained at fixed selected-answer probability thresholds. These are descriptive curves, not calibrated permissions for automation. |
+| Family bootstrap intervals | Resample scenario families rather than treating their variations as independent incidents. |
+| Median and p95 latency | Successful calls only. Local latency includes feature transformation and prediction; hosted latency includes network and serving time. ML fitting time is recorded separately. |
+| Failure and usage records | Attempted, failed and missing responses; returned model identity, usage and probability-adjustment metadata where available. |
 
-Pin models, library versions, prompts, policies, hardware, context limits and serving configurations. Report hosted API latency separately from local classifier latency. ML training time is recorded separately from inference. Use a rule-based reference to establish whether a model adds value.
+Jev's provider confidence is separate from its candidate-answer probabilities. Common probability scores use the latter. Rules return decisions without probability distributions. I do not fabricate missing probabilities or predictions.
 
-Jev receives the policy and incident evidence without telecom fine-tuning. The ML classifier uses only the 600 training inputs and their labels; its TF-IDF vocabulary and four logistic classifiers are fitted there. Hyperparameters are fixed before validation. Both receive the same state string, but have different training histories. Keep later prompt optimization and calibration separate and disclose the data used.
+## Completed experiment controls
 
-Use grouped uncertainty estimates over independent incident families, not individual paraphrases. Report performance by scenario category. A balanced synthetic suite does not estimate production incident frequencies, production calibration, or operational savings.
+I fixed the original ML settings before validation. I used validation failures to develop revised ML features and focused Jev requests, then froze the inference source before the full test and challenge runs. Both Jev variants used the same updated response handler, which normalizes only bounded rounding drift and retains raw values.
 
-The learning set is 11 validation records, one per family. It overlaps validation and is not an additional independent evaluation set. Brier scoring and coverage curves use candidate-answer probabilities. Jev's provider confidence is retained separately and should not be substituted for these probabilities. Classical ML probabilities are uncalibrated fitted estimates.
+The 11 learning packets already belong to validation. Training, validation and test families are disjoint, but repeated wording and network structures can recur. Five test packets and four challenge packets appeared in earlier runs. I report that exposure rather than describing the full checks as entirely unseen.
 
-## Integrity checks before publication
+Each regular evaluation set has 11 families with 20 correlated variations per family. The challenge has four types and 12 pairs. This sample does not establish real incident frequencies, production calibration, operational savings or model superiority.
 
-Confirm disjoint split families; reject duplicate or near-duplicate leakage; check that future evidence and labels never enter requests; validate policy-label consistency; verify all reported results against raw run records. Review project files and publication metadata to ensure only the fictional operator identity appears.
+## Next experiment
+
+I will use new development families to test explicit dependency coverage and measurement freshness, changing one input element at a time and including correct cases to detect regressions. I will keep the policy and Jev checkpoint fixed and fit any revised ML features only on training data.
+
+I will freeze the transformations and questions before checking new evaluation families that did not influence them. I will retain all four outputs, score software priority separately, inspect high-probability errors and review ambiguous diagnostic references with network specialists. See [the overview](experiment-overview.md#next-experiment).
+
+Threshold selection, operational calibration, cost estimates, throughput tests and raw KPI anomaly detection remain future work. The existing coverage curves do not validate an automation threshold.
+
+## Before publishing results
+
+I check split-family separation, input/answer-key isolation, timestamp availability, paired interventions and checksums. I verify reported scores against the saved runs and record the input, question, training and source fingerprints. I keep credentials out of tracked files and exports and use the fictional operator identity throughout.
+
+Historical runs remain local and ignored by Git. The repository includes their measured reports; a fresh clone does not contain the raw evidence needed to re-audit those historical predictions. See [verification](verification.md).

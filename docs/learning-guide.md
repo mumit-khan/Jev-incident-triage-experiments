@@ -1,68 +1,74 @@
-# Learn Jev through telecom incident decisions
+# Learning guide
 
-Start with **Learning set**. Run the ML classifier first. It works without an API key. Add Jev when you have a key, using the same incidents. Compare disagreements, not just the overall percentage.
+I use the lab to understand how Jev, ML and rules turn incident evidence into four bounded decisions. I start with saved cases, then use local replays or new comparisons to investigate disagreements.
 
-## Understand the request
+## Explore the completed study
 
-Open **What Jev receives** beneath an incident. The app shows the exact model name, state and questions. **Copy request** lets you inspect the request separately. It includes the fictional policy and evidence but no reference answers or credentials.
+Start the app as described in [the README](../README.md#start). The current working session is at [port 8768](http://127.0.0.1:8768/explorer); the default startup port is 8766.
 
-- **State:** what the investigator knows now, including impact, observations, topology and change information.
-- **Questions:** bounded decisions with an explicit list of options and descriptions.
-- **Response:** the selected option, option probabilities and Jev's separate confidence value.
+Choose **Study walkthrough** and start the guided tour. It begins with radio scheduler case `NS-b073aba91088` from validation. Follow the eight chapters in [the walkthrough guide](observatory.md). In **Case workbench**, read **Evidence**, compare **Decisions**, then open **Inside an approach**. **Paired change** compares the controlled inputs.
 
-For this first lab all questions use Choice. A binary Choice is used for insufficient evidence so both approaches return the same output shape. Jev also offers Noul for a yes/no probability and Score for an ordered rubric; those can be explored later without changing the initial experiment.
+The walkthrough reads the fixed saved experiment runs. A fresh clone has no historical run files, so it shows missing results while keeping data inspection and local ML replay available.
 
-## Review failures and improvements
+## Run a new comparison
 
-Open the updated lab at **http://127.0.0.1:8767/** for this session. Select the saved full validation run containing both original and revised approaches. Use **Show cases** to find errors by original ML, original Jev, both, regressions or high-probability wrong choices. The guided buttons cover priority, recovery, radio evidence, maintenance scope and ML regressions.
+In **Comparison lab**, expand **Run a new comparison**. Select **Learning set · one case per family** and **ML · original** to run the 11 teaching cases locally. Read the packet before revealing **Benchmark reference decisions**; the reference is separate from the model prediction.
 
-The revised ML approach uses compact evidence, word/character features and structured impact. Priority is learned from impact features alone. All fitting still uses only the original training split. The revised Jev approach uses the same checkpoint with compact evidence and clearer independent questions. Each matched pair of approaches receives the same state: original ML/original Jev, or compact ML/focused Jev.
+To compare Jev, enter a key in **Model settings** and select **Jev · original** with **ML · original** on the same cases. Hosted calls incur provider charges. Both receive the same original state, but only ML learns from this lab's labelled training examples.
 
-**With software priority** is a separate score: retain the model’s three contextual decisions and compute priority from the fictional policy. It does not overwrite original predictions. Inspect owner and diagnostic regressions even when the overall percentage improves.
+For experiment 2 variants, select **ML · revised** and **Jev · focused**. They receive the same compact state; focused Jev also receives more explicit questions, and revised ML derives structured impact features. Both ML variants fit only the original 600 training packets.
 
-**What Jev receives** now lets you switch between original and focused requests. In the paired challenges, inspect **Changed evidence fields**, then move to the paired incident. A topology change can invalidate a plausible routing answer even when the fault description stays unchanged.
+Use **Run history** to choose recorded comparisons. Compare an earlier run only when its input fingerprint matches. **Export JSON** preserves public predictions, probabilities, metrics, usage and training metadata. Keys are excluded. New runs appear in the comparison lab; they do not replace the walkthrough's fixed run IDs.
 
-Use validation for changes. Freeze the approach before test or challenge evaluation, and use newly authored scenarios for the next tuning round. Earlier saved runs retain their predictions. The full [measured failure review](performance-review.md) records scores, case links, remaining gaps and proposed next experiments.
+## Inspect what produced a decision
 
-## Three cases to inspect
+| Approach | What to inspect |
+|---|---|
+| Rules | Executed keyword branches and the separate priority calculation. Healthy-domain words can still trigger routing. |
+| ML · original / revised | Active features, fitted weight differences and their contribution to one class versus another. The complete sum plus intercept reconstructs the log probability ratio. |
+| Jev · original / focused | State, Choice definitions, exact request, returned answers and response audit. Hosted weights and internal reasoning are unavailable. |
 
-**Radio scheduler.** Delay rises despite low radio resource occupancy. The scheduler reports task stalls, while the uplink is healthy. Does each approach select RAN and radio diagnostics? Which evidence supports that selection?
+In **What changed**, compare the original and transformed packets, impact bands, report age and questions. Open the complete JSON when needed. In the comparison lab, **What Jev receives → Request version** exposes the same request variants.
 
-**Transport optics.** Optical power declines from its own baseline and frame errors increase. Radio alarms follow packet loss. Does the approach investigate transport, or does the word “radio” pull it toward the wrong team?
+Jev returns a chosen answer, candidate-answer probabilities and a separate provider confidence value. ML returns fitted class probabilities. Neither has been calibrated for operations. Feature contributions explain the fitted score, not a network's physical cause.
 
-**Unknown alarm clock offsets.** Alarm timestamps disagree and current service impact and dependencies are unverified. Does the approach retain the incident at operations and ask for evidence, or guess a fault domain?
+## Review failures
 
-These examples exercise anomaly interpretation, dependency reasoning and missing information. These are fictional reference cases. The measured review records actual Jev decisions separately.
+In the workbench, expand **Choose a packet**, select a family and open **Failure filters**. Select the approach before filtering for wrong decisions or wrong choices at 80% probability or higher. The ML regression filter finds a newly wrong field even when another field was already wrong. Previous/next stays within the matching packets. An empty filter explains that the previously opened evidence remains visible.
 
-## Explore paired challenges
+In the comparison lab, **Show cases** provides original-model errors, regressions, high-probability wrong choices and failed responses. Guided validation buttons cover priority, recovery, radio evidence, maintenance scope and an ML regression.
 
-Each pair has one controlled change:
+Start with these cases in [the measured review](performance-review.md):
 
-- **Impact boundary:** nine affected outage sites become ten; only priority should change under the fictional policy.
-- **Stale evidence:** current power evidence becomes stale; the next step should shift to gathering current evidence.
-- **Irrelevant change:** a recent change is added after independently confirmed recovery; timing alone should not create an active fault.
-- **Topology dependency:** affected sites stop depending on the failing uplink; the apparent transport explanation should no longer justify that investigating team.
+- Radio scheduler: direct task stalls support RAN diagnostics despite an unknown exact cause.
+- Power transfer: healthy utility supply does not erase the observed outage; priority follows current impact.
+- Maintenance scope: impact extends beyond the maintenance assets, so the policy calls for verification before domain assignment.
+- ML regression: a corrected priority can accompany a newly incorrect owner or next check.
 
-The current rules and ML classifier may fail these tests. That is useful: inspect how their decisions differ from the references and from actual Jev responses.
+Use validation to develop changes. Having inspected the existing test and challenge failures, I will use new development and evaluation families for the next experiment.
 
-## Read the results carefully
+## Use the paired challenges and sandbox
 
-“All decisions correct” requires all four outputs to match an accepted reference. Failed and missing calls count against accuracy. P1 miss rate is blank when the selected sample has no P1 references. Latency includes feature transformation and prediction for ML, and network plus serving time for Jev. ML training is recorded separately and excluded from per-incident inference latency.
+The 12 challenge pairs change one factor: the nine/ten-site boundary, measurement freshness, irrelevant change timing after recovery, or dependency topology. A decision should change only when the changed evidence warrants it.
 
-Exports include field-level accuracy, confusion matrices, Brier scores, reliability bins and selected-probability coverage curves. These are measured on synthetic cases. A probability threshold that works here is not an operational permission threshold. In particular, Jev's `confidence` and selected-option probability are different values; the exported coverage curves use selected-option probability for a common measure across models.
+In **Evidence sandbox**, edit impact or the first observation and run a local replay. The before/after table highlights changed choices for rules and both ML variants. Jev is not rerun. Edits persist across chapters; selecting another packet starts a new sandbox. A stale-result notice appears after further edits. Reset discards the edits.
 
-The learning set overlaps validation. Do not present it as additional held-out evidence. Keep the test and paired challenges out of prompt changes, feature fitting and threshold selection.
+Impact edits do not rewrite observation text, so update both when they describe the same fact. Other observations and topology remain unchanged. The edited packet has no new reference answer and is not scored against the original key.
 
-## If Jev requests fail
+## Read the scores
 
-**HTTP 401** means the provider rejected the credential. Open Model settings and replace it with an active API key from [the official TypeSafe dashboard](https://console.typesafe.ai). The app accepts the raw key and strips common pasted `Bearer` or `Authorization: Bearer` wrappers and enclosing quotes. Keys containing internal whitespace are rejected locally. Saving a nonempty key confirms that it was stored, not that the provider accepted it.
+**All four decisions** requires every output to match an accepted reference. Failed and missing responses count as failures. **With software priority** retains the three contextual model decisions and separately calculates priority; it does not overwrite predictions. Pair accuracy requires all four decisions to match on both packets.
 
-Compare one incident before running a batch. A 401 or 403 stops the remaining requests to that provider; skipped incidents are reported as missing, and other selected approaches can still run. Historical runs retain their original results.
+P1 miss rate is undefined when the sample has no P1 references. ML inference latency includes feature transformation and prediction; training time is separate. Jev latency includes network and serving time. The exported reliability bins and coverage curves describe these synthetic cases; they do not set operational permission thresholds.
 
-The app sends `Authorization: Bearer <key>` to the configured endpoint. Its default is `https://api.typesafe.ai/v1/systemone`, following [TypeSafe's API reference](https://docs.typesafe.ai/api). A 422 indicates request validation, a 429 indicates rate limiting and a 529 indicates provider overload. The app displays those separately from authentication errors.
+The learning set overlaps validation. Regular family variations are correlated, and some test/challenge packets had prior exposure. Read [the dataset card](dataset-card.md) before interpreting a high score.
 
-Keys live only in the server process unless you explicitly put one in the ignored `.env` file. Restarting the app clears keys entered through Model settings. Re-enter the key there after a restart.
+## Configuration and failures
 
-## Suggested next experiment
+Keys entered in **Model settings** last for the server process. An optional `.env` can load configuration at startup and remains ignored by Git. Restarting clears keys entered through the interface.
 
-After learning the request/response pattern, add a separate synthetic KPI time-series exercise. Start with a daily load pattern, inject persistent degradation and telemetry gaps, compute deviations in software, and compare a numerical anomaly detector with Jev's interpretation. Evaluate anomaly detection separately from incident routing.
+If a response fails, inspect its recorded status and settings. The app stops that provider's remaining requests after an authentication rejection, records skipped incidents as missing and lets other selected approaches continue. It accepts only bounded rounding drift in probabilities and retains the original values. Exported errors exclude credentials.
+
+## Next experiment
+
+I will test explicit dependency coverage and measurement freshness on new families, one input change at a time, then evaluate the frozen revisions on separate families. I will score software priority separately and inspect regressions and high-probability errors. [The overview](experiment-overview.md#next-experiment) records the plan. Raw KPI time-series anomaly detection remains a later, separate experiment.

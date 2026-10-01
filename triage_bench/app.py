@@ -236,7 +236,18 @@ class App:
         return {'ok':True}
 
 
-def handler_for(app):
+def handler_for(app, comparison_port=None):
+    study_handler = None
+    study_lock = threading.Lock()
+
+    def explorer_handler():
+        nonlocal study_handler
+        with study_lock:
+            if study_handler is None:
+                from .explorer import Study, handler_for as explorer_handler_for
+                study_handler = explorer_handler_for(Study(app.root))
+        return study_handler
+
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -248,6 +259,8 @@ def handler_for(app):
             return not origin or origin in {'http://'+host for host in expected}
 
         def send(self, status, body, content_type='application/json'):
+            if urlparse(self.path).path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/sandbox','/api/export','/study.md'}:
+                return explorer_handler().send(self, status, body, content_type)
             data=body if isinstance(body,bytes) else json.dumps(body).encode()
             self.send_response(status)
             self.send_header('Content-Type',content_type)
@@ -262,6 +275,11 @@ def handler_for(app):
             if not self.trusted(): return self.send(403,{'error':'Local origin required.'})
             path=urlparse(self.path)
             try:
+                if path.path=='/api/study-status': return self.send(200,{'available':True})
+                if path.path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/export','/study.md'}:
+                    return explorer_handler().do_GET(self)
+                if comparison_port and (path.path in {'/api/config','/api/incidents','/api/jobs'} or path.path.startswith('/api/jobs/')):
+                    return self.forward_comparison()
                 if path.path=='/api/config': return self.send(200,app.config())
                 if path.path=='/api/incidents': return self.send(200,app.incidents(parse_qs(path.query).get('split',['validation'])[0]))
                 if path.path=='/api/jobs':
@@ -280,6 +298,7 @@ def handler_for(app):
 
         def do_POST(self):
             if not self.trusted(): return self.send(403,{'error':'Local origin required.'})
+            if self.path=='/api/sandbox': return explorer_handler().do_POST(self)
             if self.headers.get('Content-Type','').split(';')[0]!='application/json':
                 return self.send(415,{'error':'Use JSON.'})
             try:
@@ -287,22 +306,42 @@ def handler_for(app):
                 if not 0<size<=65536: raise ValueError('Invalid request size.')
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict): raise ValueError('Expected a JSON object.')
+                if comparison_port and self.path in {'/api/config','/api/jobs','/api/cancel'}:
+                    return self.forward_comparison(data)
                 if self.path=='/api/config': return self.send(200,app.configure(data))
                 if self.path=='/api/jobs': return self.send(202,app.start(data))
                 if self.path=='/api/cancel': return self.send(200,app.cancel(data.get('id')))
                 return self.send(404,{'error':'Not found.'})
             except (ValueError,TypeError,KeyError) as exc:
                 self.send(400,{'error':str(exc)})
+
+        def forward_comparison(self, payload=None):
+            """Optional loopback bridge preserves an already-running session."""
+            import urllib.error
+            import urllib.request
+            request=urllib.request.Request(f'http://127.0.0.1:{comparison_port}'+self.path,
+                data=json.dumps(payload).encode() if payload is not None else None,
+                headers={'Content-Type':'application/json'} if payload is not None else {})
+            try:
+                with urllib.request.urlopen(request,timeout=10) as response:
+                    return self.send(response.status,response.read())
+            except urllib.error.HTTPError as exc:
+                return self.send(exc.code,exc.read())
+            except OSError:
+                return self.send(503,{'error':'The existing comparison session is unavailable. Start the app without --comparison-port to use its own session.'})
     return Handler
 
 
 def main():
     parser=argparse.ArgumentParser(description='Northstar model comparison app')
     parser.add_argument('--port',type=int,default=8765)
+    parser.add_argument('--comparison-port',type=int,help='Reuse a running comparison session on another loopback port')
     args=parser.parse_args()
+    if args.comparison_port and (not 1<=args.comparison_port<=65535 or args.comparison_port==args.port):
+        parser.error('--comparison-port must be a different valid local port.')
     load_env(ROOT/'.env')
     app=App()
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler_for(app))
+    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler_for(app,args.comparison_port))
     print(f'Northstar comparison app: http://127.0.0.1:{args.port}',flush=True)
     try: server.serve_forever()
     except KeyboardInterrupt: pass

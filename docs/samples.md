@@ -1,91 +1,159 @@
 # Sample synthetic incidents
 
-Each example is fictional. Labels are benchmark references for initial investigation, not confirmed root causes.
+I show observation excerpts from the frozen inputs and their separate reference decisions. These are initial-investigation references, not model predictions or confirmed root causes. Counts and priority belong to the selected packet; other variations can differ.
 
-## power fuse
+## Power Fuse
 
-Investigation notes: A blown DC distribution fuse isolates the radio and site router. Independent upstream probes show the aggregation node is healthy.
+Packet `NS-3717a233200d` · `test` · family `power_fuse`.
 
-Impact: `{"affected_sites": 1, "basis": "Current independent service checks", "status": "outage"}`
+A blown DC distribution fuse isolates the radio and site router. Independent upstream probes show the aggregation node is healthy.
 
-Expected decisions: `{"initial_owner": "power", "insufficient_evidence": "no", "next_check": "inspect_power", "priority": "P2"}`
+Service impact:
 
-## noc clear only
+`{"affected_sites": 1, "basis": "Current independent service checks", "status": "outage"}`
 
-Shift update — The alarm cleared, but post-clear service measurements have not arrived. Recovery cannot yet be established from the available evidence.
+Reference decisions:
 
-Impact: `{"affected_sites": null, "basis": "Not independently verified", "status": "unknown"}`
+`{"initial_owner": "power", "insufficient_evidence": "no", "next_check": "inspect_power", "priority": "P2"}`
 
-Expected decisions: `{"initial_owner": "noc", "insufficient_evidence": "yes", "next_check": "gather_evidence", "priority": "P3"}`
+## Noc Clear Only
 
-## radio neighbor
+Packet `NS-163edc67cb64` · `test` · family `noc_clear_only`.
+
+The alarm cleared, but post-clear service measurements have not arrived. Recovery cannot yet be established from the available evidence.
+
+Service impact:
+
+`{"affected_sites": null, "basis": "Not independently verified", "status": "unknown"}`
+
+Reference decisions:
+
+`{"initial_owner": "noc", "insufficient_evidence": "yes", "next_check": "gather_evidence", "priority": "P3"}`
+
+## Radio Neighbor
+
+Packet `NS-50f2d4fcb9b6` · `test` · family `radio_neighbor`.
 
 Mobility failures are restricted to a newly introduced neighbor relation. Stationary sessions and transport probes succeed.
 
-Impact: `{"affected_sites": 2, "basis": "Current independent service checks", "status": "degraded"}`
+Service impact:
 
-Expected decisions: `{"initial_owner": "ran", "insufficient_evidence": "no", "next_check": "inspect_radio", "priority": "P3"}`
+`{"affected_sites": 2, "basis": "Current independent service checks", "status": "degraded"}`
 
-## power controller
+Reference decisions:
 
-Operator observation: The power controller repeatedly opens the DC contactor despite healthy mains. Equipment resets align with the contactor events.
+`{"initial_owner": "ran", "insufficient_evidence": "no", "next_check": "inspect_radio", "priority": "P3"}`
 
-Impact: `{"affected_sites": 1, "basis": "Current independent service checks", "status": "degraded"}`
+## Power Controller
 
-Expected decisions: `{"initial_owner": "power", "insufficient_evidence": "no", "next_check": "inspect_power", "priority": "P3"}`
+Packet `NS-c6144d55e07b` · `test` · family `power_controller`.
 
-## noc postmaintenance
+The power controller repeatedly opens the DC contactor despite healthy mains. Equipment resets align with the contactor events.
 
-Shift update — Planned work has ended. Independent service checks confirm sustained baseline performance for the full recovery observation interval; a delayed maintenance alarm is historical, not a current fault.
+Service impact:
 
-Impact: `{"affected_sites": 0, "basis": "Current independent service checks", "status": "none"}`
+`{"affected_sites": 1, "basis": "Current independent service checks", "status": "degraded"}`
 
-Expected decisions: `{"initial_owner": "noc", "insufficient_evidence": "no", "next_check": "monitor", "priority": "P4"}`
+Reference decisions:
 
-## core certificate
+`{"initial_owner": "power", "insufficient_evidence": "no", "next_check": "inspect_power", "priority": "P3"}`
 
-Operator observation: Core service-to-service authentication fails after a certificate expired. Radio and transport checks pass on independent access paths.
+## Noc Postmaintenance
 
-Impact: `{"affected_sites": 12, "basis": "Current independent service checks", "status": "outage"}`
+Packet `NS-5ad9c4ddef4b` · `test` · family `noc_postmaintenance`.
 
-Expected decisions: `{"initial_owner": "core", "insufficient_evidence": "no", "next_check": "inspect_core", "priority": "P1"}`
+Planned work has ended. Independent service checks confirm sustained baseline performance for the full recovery observation interval; a delayed maintenance alarm is historical, not a current fault.
 
-## transport qos
+Service impact:
+
+`{"affected_sites": 0, "basis": "Current independent service checks", "status": "none"}`
+
+Reference decisions:
+
+`{"initial_owner": "noc", "insufficient_evidence": "no", "next_check": "monitor", "priority": "P4"}`
+
+## Core Certificate
+
+Packet `NS-f45aa5858ae2` · `test` · family `core_certificate`.
+
+Core service-to-service authentication fails after a certificate expired. Radio and transport checks pass on independent access paths.
+
+Service impact:
+
+`{"affected_sites": 12, "basis": "Current independent service checks", "status": "outage"}`
+
+Reference decisions:
+
+`{"initial_owner": "core", "insufficient_evidence": "no", "next_check": "inspect_core", "priority": "P1"}`
+
+## Transport Qos
+
+Packet `NS-948ed62ffbbf` · `test` · family `transport_qos`.
 
 Only the expedited forwarding queue drops traffic on the common uplink. Other classes succeed and radio resource occupancy is normal.
 
-Impact: `{"affected_sites": 9, "basis": "Current independent service checks", "status": "degraded"}`
+Service impact:
 
-Expected decisions: `{"initial_owner": "transport", "insufficient_evidence": "no", "next_check": "inspect_transport", "priority": "P3"}`
+`{"affected_sites": 9, "basis": "Current independent service checks", "status": "degraded"}`
 
-## core signaling
+Reference decisions:
+
+`{"initial_owner": "transport", "insufficient_evidence": "no", "next_check": "inspect_transport", "priority": "P3"}`
+
+## Core Signaling
+
+Packet `NS-3f4de857ec84` · `test` · family `core_signaling`.
 
 A shared core signaling worker queue is stalled. Requests from independent access paths reach it but are not processed.
 
-Impact: `{"affected_sites": 18, "basis": "Current independent service checks", "status": "degraded"}`
+Service impact:
 
-Expected decisions: `{"initial_owner": "core", "insufficient_evidence": "no", "next_check": "inspect_core", "priority": "P2"}`
+`{"affected_sites": 18, "basis": "Current independent service checks", "status": "degraded"}`
 
-## noc nearby
+Reference decisions:
+
+`{"initial_owner": "core", "insufficient_evidence": "no", "next_check": "inspect_core", "priority": "P2"}`
+
+## Noc Nearby
+
+Packet `NS-5321254e60e7` · `test` · family `noc_nearby`.
 
 Nearby sites report similar symptoms but have independent documented transport and power paths. No current domain-specific fault evidence is available.
 
-Impact: `{"affected_sites": null, "basis": "Not independently verified", "status": "unknown"}`
+Service impact:
 
-Expected decisions: `{"initial_owner": "noc", "insufficient_evidence": "yes", "next_check": "gather_evidence", "priority": "P3"}`
+`{"affected_sites": null, "basis": "Not independently verified", "status": "unknown"}`
 
-## transport asymmetry
+Reference decisions:
 
-Operator observation: Bidirectional probes show loss only on the return aggregation path. Radio processing and the outbound transport path are healthy.
+`{"initial_owner": "noc", "insufficient_evidence": "yes", "next_check": "gather_evidence", "priority": "P3"}`
 
-Impact: `{"affected_sites": 12, "basis": "Current independent service checks", "status": "degraded"}`
+## Transport Asymmetry
 
-Expected decisions: `{"initial_owner": "transport", "insufficient_evidence": "no", "next_check": "inspect_transport", "priority": "P2"}`
+Packet `NS-19cd88f8e238` · `test` · family `transport_asymmetry`.
 
-## radio pim
+Bidirectional probes show loss only on the return aggregation path. Radio processing and the outbound transport path are healthy.
 
-Operator observation: Uplink interference tracks downlink transmit power on one sector. The shared transport path has clean counters and normal latency.
+Service impact:
 
-Impact: `{"affected_sites": 1, "basis": "Current independent service checks", "status": "degraded"}`
+`{"affected_sites": 12, "basis": "Current independent service checks", "status": "degraded"}`
 
-Expected decisions: `{"initial_owner": "ran", "insufficient_evidence": "no", "next_check": "inspect_radio", "priority": "P3"}`
+Reference decisions:
+
+`{"initial_owner": "transport", "insufficient_evidence": "no", "next_check": "inspect_transport", "priority": "P2"}`
+
+## Radio Pim
+
+Packet `NS-69782dcac43c` · `test` · family `radio_pim`.
+
+Uplink interference tracks downlink transmit power on one sector. The shared transport path has clean counters and normal latency.
+
+Service impact:
+
+`{"affected_sites": 1, "basis": "Current independent service checks", "status": "degraded"}`
+
+Reference decisions:
+
+`{"initial_owner": "ran", "insufficient_evidence": "no", "next_check": "inspect_radio", "priority": "P3"}`
+
+The [dataset card](dataset-card.md) explains construction and family variations. The [policy](policy.md) defines the outputs, and the [walkthrough guide](observatory.md) explains how to inspect complete packets and actual predictions.

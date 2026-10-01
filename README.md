@@ -1,71 +1,87 @@
-# Northstar Telecom: Jev learning lab
+# Jev incident triage experiments
 
-A local synthetic demo for learning how Jev makes bounded decisions inside a telecom workflow, with a conventional trained ML classifier for comparison.
+I compare Jev, trained machine learning (ML) and rules on incident decisions for **Northstar Telecom**, a fictional network. I inspect failures, test changes to inputs and questions, and keep the measured results available for review.
 
-**This is a learning exercise.** Northstar Telecom is fictional. No private tickets, real inventory or operational runbooks are included. No network actions are executed.
+The lab recommends diagnostics. It does not execute network changes. The data consists of constructed teaching scenarios; scores do not establish performance on a real network. Raw KPI time-series anomaly detection remains a separate future experiment.
 
 ## Start
 
-With `uv` installed, run from this directory:
+Clone this repository and start the local app with Python 3.11+ and `uv`:
 
 ```bash
+git clone git@github.com:mumit/Jev-incident-triage-experiments.git
+cd Jev-incident-triage-experiments
 uv sync --locked
 uv run --locked python -m triage_bench.app --port 8766
 ```
 
-Open **http://127.0.0.1:8766**. Alternatively, double-click `start.command` on a Mac. If `uv` is unavailable, the launcher uses Python 3.11+ and installs the pinned requirements into a local virtual environment.
+Open [the comparison lab](http://127.0.0.1:8766/) or [the study walkthrough](http://127.0.0.1:8766/explorer). On a Mac, `start.command` starts the app at port 8766; its fallback installs the pinned requirements into a local virtual environment when `uv` is unavailable.
 
-The app does not download language-model weights or call Jev on startup. The ML classifier trains locally when first selected; later comparisons reuse it within that server session.
+The current working session uses [port 8768](http://127.0.0.1:8768/explorer). Links to individual saved cases in the measured review use that session. Substitute your server's port when following those links.
 
-## First experiment
+Startup does not call Jev or download language-model weights. The app fits local classifiers when first needed and reuses them within the server session. Enter a key in **Model settings** to run new hosted Jev comparisons. Hosted calls incur provider charges. Keys entered there stay in server memory; `.env` is an optional ignored configuration file.
 
-1. Select **Learning set** and **ML · original**. Run the 11 learning cases, one per validation scenario family.
-2. Choose an incident. Read its full evidence and then reveal **Benchmark reference decisions**. These are authored answers, not model predictions.
-3. Inspect the actual ML decisions and probability distributions. Look at where it chooses the wrong investigating team, misses missing evidence or misreads priority.
-4. Open **Model settings**, enter your own Jev key and save. The key stays in server memory. The default is the pinned `jev-1.13.0` model.
-5. Select **Jev · original** and **ML · original**, then run the same cases. Both receive the same policy and incident state. Calls to the hosted API incur your provider's charges.
-6. Try **Paired challenge**. A single changed fact can change the correct decision, or should leave it unchanged.
-7. Export JSON to retain predictions, answer probabilities, latency, failures, model version and training fingerprints.
+## Read and explore
 
-For the current failure-review session, the updated app is running at **http://127.0.0.1:8767/**. It adds **ML · compact + impact features** and **Jev · focused questions**, failure filters, regression review and paired evidence inspection. Read [the measured performance review](docs/performance-review.md) for actual before/after results and remaining gaps.
+| Document | What it covers |
+|---|---|
+| [Experiment overview](docs/experiment-overview.md) | Purpose, data definitions, both experiments, input changes, results and the next experiment. |
+| [Walkthrough guide](docs/observatory.md) | The eight chapters, case inspection, ML microscope, Jev requests and local sandbox. |
+| [Learning guide](docs/learning-guide.md) | Running comparisons and interpreting disagreements. |
+| [Measured performance review](docs/performance-review.md) | Scores, saved case links, regressions, run IDs and fingerprints. |
+| [Dataset card](docs/dataset-card.md) | Construction, family splits, paired challenges and realism limits. |
+| [Policy](docs/policy.md) | The four decisions and fictional priority rules. |
+| [Evaluation plan](docs/evaluation-plan.md) | Scoring, experimental controls and proposed future checks. |
+| [Samples](docs/samples.md) | Input excerpts and separate reference decisions. |
+| [Verification](docs/verification.md) | Current tests, browser checks and publication limits. |
 
-Read [the learning guide](docs/learning-guide.md) for the questions to ask while comparing results.
+In the walkthrough, start the guided tour with the radio scheduler validation case. Move through **Evidence**, **Decisions** and **Inside an approach**. **Paired change** compares controlled inputs. The sandbox changes a copy and runs only rules and the two local ML variants; it does not call Jev or change saved results.
 
-## What is compared
+## Approaches and experiments
 
-| Component | How it works | What it needs |
-|---|---|---|
-| Jev | Evaluates a supplied policy, incident state and four Choice questions | Your API key; no telecom fine-tuning in this lab |
-| ML classifier | TF-IDF unigram/bigram features and one logistic regression classifier per output | 600 labeled synthetic training examples from 30 families |
-| Rules reference | Simple keyword routing and an exact impact-priority rule | No training or API key |
+Every approach selects an initial investigating team, priority, next diagnostic check and whether evidence is insufficient.
 
-The four outputs are initial investigating team, fictional policy priority, next diagnostic check and whether evidence is insufficient. This version uses Choice questions for all four outputs to maintain a common comparison contract. It does not demonstrate Score or Noul yet.
+| Approach in the app | Implementation |
+|---|---|
+| Rules | Fixed keyword routing and the exact impact-priority calculation. |
+| ML · original | Word TF-IDF features and four logistic regression classifiers. |
+| ML · revised | Compact evidence, word/character features and structured impact. Its priority classifier uses impact features alone. |
+| Jev · original | Hosted `jev-1.13.0`, the original state and short Choice definitions. |
+| Jev · focused | The same checkpoint and policy, compact evidence and explicit Choice definitions. |
 
-The ML text features use the **same exact state string** supplied to Jev. Record IDs, labels and family metadata are excluded. The original ML parameters were fixed before validation. The revised representation and focused Jev questions were designed after reviewing original validation failures, then frozen before test and challenge checks. Jev is not trained on the telecom labels. Consequently, this compares two approaches to the task, rather than equal training histories. Rules are included to show which parts are better handled by software.
+Experiment 1 evaluated the original approaches. Experiment 2 revised ML's features and Jev's state and questions after validation review, then froze them before full test and challenge checks. Both ML variants fit only the original 600 training records. Each ML/Jev pair receives the same state string; their training histories differ. The rules use observation text and structured impact.
 
-## Anomaly detection boundary
+**With software priority** is a separate score that replaces priority with the exact policy calculation while retaining the three model decisions. Saved predictions remain unchanged. The next experiment will isolate dependency coverage and measurement freshness on new development and evaluation families; it has not run.
 
-RAN KPI deviations, abnormal scheduling delay and optical degradation appear as incident evidence. The lab tests their interpretation and next investigation step. It does not yet detect anomalies from raw KPI time series, simulate network physics or forecast faults. A later anomaly experiment should compare a numerical detector and Jev on clearly matched tasks.
+## Data and saved results
 
-## Dataset and verification
+The frozen dataset contains 600 training, 220 validation, 220 test and 24 challenge packets. Regular families contain 20 correlated variations; the challenge has 12 pairs across four types. The 11-packet learning set is a subset of validation. Training, validation and test families are disjoint. Five test and four challenge packets had appeared in earlier runs, so the full checks were not entirely untouched evaluations.
 
-Frozen dataset: 600 training records, 220 validation records, 220 test records and 24 challenge records in 12 pairs. Each regular scenario has 20 surface variations. The learning set reuses one record from each of the 11 validation families and is not an extra held-out split.
+The repository contains the synthetic inputs, separate answer keys, source code and measured reports. Raw local runs and the freeze record remain in ignored `runs/`. A fresh clone can explore the data, fit local ML and use the sandbox, but cannot display historical predictions or verify their hashes without those run files. Missing results remain explicit. New comparisons populate the comparison lab; the walkthrough reads the fixed run IDs documented in the measured review.
 
-Training, validation and test scenario families are disjoint. The small number of independently authored families, templated language and artificial incident distribution limit what these scores establish. Labels have not been certified by a telecom specialist. Local classifier probabilities have not been calibrated for operations. Jev's returned confidence is separate from its selected-option probability.
+Jev's hosted weights and reasoning are unavailable. The app exposes its requests and returned answers. ML contributions reconstruct the fitted classifier's score; they do not establish causes in a network. Neither model's probabilities have been calibrated for operations.
+
+## Checks
+
+Node.js is needed for the browser-script checks, not for running the Python app.
 
 ```bash
 uv run --locked python -m triage_bench validate
 uv run --locked python -m unittest discover -s tests -v
+node --test tests/explorer-ui.test.cjs
+node --check triage_bench/web/app.js
+node --check triage_bench/web/explorer.js
+bash -n start.command
 ```
 
-[Dataset card](docs/dataset-card.md) · [Fictional policy](docs/policy.md) · [Evaluation plan](docs/evaluation-plan.md) · [Sample incidents](docs/samples.md)
+The working checkout passes 40 Python tests and nine JavaScript tests. Two Python checks depend on historical run files and skip on a fresh clone. See [verification](docs/verification.md) for their scope.
 
 ## References
 
-- [TypeSafe introduction and decision primitives](https://docs.typesafe.ai/introduction)
-- [Jev quickstart](https://docs.typesafe.ai/introduction/quickstart)
-- [Current Jev models](https://docs.typesafe.ai/models)
+- [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart)
+- [Jev model information](https://docs.typesafe.ai/models)
 - [Jev limitations](https://docs.typesafe.ai/model-jaggedness/jev-1.13)
+- [Scikit-learn text feature extraction](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction)
 - [Scikit-learn logistic regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)
 
-The source was adapted from the earlier local Northstar synthetic incident benchmark. The trained ML comparison and focused learning workflow are additions in this project.
+I adapted the source from an earlier local synthetic incident benchmark. This repository adds the trained ML comparison, focused Jev requests and interactive study walkthrough.
