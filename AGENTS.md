@@ -12,7 +12,7 @@ API keys remain server-side, out of Git, logs and exported results. The app bind
 
 Run dataset validation, the unit suite and JavaScript syntax checks after changes to inference or evaluation. Update the learning guide when the workflow changes.
 
-Use the app labels Rules, ML · original, ML · revised, Jev · original and Jev · focused in guides. Keep the user-edited experiment overview and exported Markdown copies aligned. Preserve frozen data and measured results; raw runs and credentials stay ignored. Run the Python suite, dataset validator, both browser-script syntax checks and `node --test tests/explorer-ui.test.cjs` before publishing changes.
+Use the app labels Rules, ML · original, ML · revised, Jev · original and Jev · focused in guides. Keep the user-edited experiment overview and exported Markdown copies aligned. Preserve frozen data and measured results; raw runs and credentials stay ignored. Run the Python suite, dataset validator, all three browser-script syntax checks and `node --test tests/explorer-ui.test.cjs` before publishing changes.
 
 Write study narration in first person for authorship, choices, judgments and limitations. Let models, data, methods and results lead descriptions of their behavior. Avoid repeated “I used,” “I trained” or “I will” openings. Preserve completed-versus-planned work and technical qualifications when revising prose.
 

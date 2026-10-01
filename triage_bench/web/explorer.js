@@ -77,6 +77,7 @@ function render(capture=true) {
  });
  const comparisonURL='/?run='+(study.runs[state.split]?.id||study.runs.validation?.id||'')+'&case='+state.id;
  $('#comparison-link').href=comparisonURL;$('#top-comparison-link').href=comparisonURL;
+ document.querySelectorAll('[data-study-link]').forEach(link=>link.href='/study?'+new URLSearchParams({return:new URL(location.href).pathname+new URL(location.href).search+new URL(location.href).hash}));
  $('#chapter-footer').innerHTML=`<span>${index?button('← '+chapters[index-1][1],'page',`data-page="${chapters[index-1][0]}"`):'Northstar Telecom · Synthetic study'}</span><span>${index<chapters.length-1?button(chapters[index+1][1]+' →','page',`data-page="${chapters[index+1][0]}"`,'primary'):button('Return to the workbench','page','data-page="cases"','primary')}</span>`;
  if(state.page==='cases' && state.caseTab==='inside' && ['ml','ml_structured'].includes(state.model) && !state.microscope) loadMicroscope();
 }

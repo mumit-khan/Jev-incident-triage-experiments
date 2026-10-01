@@ -40,6 +40,8 @@ Start with [HANDOFF.md](HANDOFF.md) for the current state, experimental controls
 | [Run bundle](docs/run-bundle.md) | Download, verify and restore historical study evidence. |
 | [Verification](docs/verification.md) | Current tests, browser checks and publication limits. |
 
+Choose **Read study** for the formatted experiment overview at `/study`, with section navigation, expandable tables, copyable code and links into case inspection. **Return to walkthrough** restores the selected packet, approach, field and chapter. **Download Markdown** keeps the source available for editors. The page reads the Markdown on each request.
+
 In the walkthrough, start the guided tour with the radio scheduler validation case. Move through **Evidence**, **Decisions** and **Inside an approach**. **Paired change** compares controlled inputs. The sandbox changes a copy and runs only rules and the two local ML variants; it does not call Jev or change saved results.
 
 ## Approaches and experiments
@@ -76,10 +78,11 @@ uv run --locked python -m unittest discover -s tests -v
 node --test tests/explorer-ui.test.cjs
 node --check triage_bench/web/app.js
 node --check triage_bench/web/explorer.js
+node --check triage_bench/web/study.js
 bash -n start.command
 ```
 
-The working checkout passes 45 Python tests and nine JavaScript tests. Two Python checks depend on historical run files and skip on a fresh clone. See [verification](docs/verification.md) for their scope.
+The working checkout passes 51 Python tests and nine JavaScript tests. Two Python checks depend on historical run files and skip on a fresh clone. See [verification](docs/verification.md) for their scope.
 
 ## References
 

@@ -259,7 +259,7 @@ def handler_for(app, comparison_port=None):
             return not origin or origin in {'http://'+host for host in expected}
 
         def send(self, status, body, content_type='application/json'):
-            if urlparse(self.path).path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/sandbox','/api/export','/study.md'}:
+            if urlparse(self.path).path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/sandbox','/api/export','/study.md','/study','/study.css','/study.js'}:
                 return explorer_handler().send(self, status, body, content_type)
             data=body if isinstance(body,bytes) else json.dumps(body).encode()
             self.send_response(status)
@@ -276,7 +276,7 @@ def handler_for(app, comparison_port=None):
             path=urlparse(self.path)
             try:
                 if path.path=='/api/study-status': return self.send(200,{'available':True})
-                if path.path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/export','/study.md'}:
+                if path.path in {'/explorer','/explorer.js','/explorer.css','/api/study','/api/case','/api/microscope','/api/export','/study.md','/study','/study.css','/study.js'}:
                     return explorer_handler().do_GET(self)
                 if comparison_port and (path.path in {'/api/config','/api/incidents','/api/jobs'} or path.path.startswith('/api/jobs/')):
                     return self.forward_comparison()

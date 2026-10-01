@@ -15,6 +15,12 @@ The default startup port is 8766. The current session is at [port 8768](http://1
 7. **Evidence sandbox.** Edit impact or the first observation and run rules and both local ML variants. The before/after table marks changed choices. Edits persist across chapters; selecting another packet starts a new sandbox. Further edits mark the replay stale. Reset discards edits. Jev is not rerun, and edited evidence has no new reference score.
 8. **Next experiment.** Read the planned tests of dependency coverage and measurement freshness on new families. The experiment has not run. The existing saved results stay unchanged.
 
+## Read the study
+
+**Read study** opens the formatted experiment overview in another tab. Desktop readers get a section list; narrow screens use **Jump to section**. **Expand table** opens a larger comparison view. Code examples expand for inspection and offer **Copy code**, with selectable text if clipboard access is unavailable.
+
+Case identifiers and inspection links open the relevant workbench or chapter. Referenced study guides use the same reader. **Return to walkthrough** restores the packet, approach, field, inspection view and chapter selected when the article opened. **Download Markdown** provides the original source. Edits to repository Markdown appear on the next page load.
+
 ## Inspect an approach
 
 **Rules** exposes executed branches and the separate priority calculation. It does not infer graph dependencies or reliably resolve negation in observations.

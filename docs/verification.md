@@ -4,7 +4,7 @@ September 30, 2026. This document records the current implementation checks and 
 
 ## Automated checks
 
-The working checkout passes **45 Python tests and nine JavaScript tests**. Dataset validation confirms 600 training, 220 validation, 220 test and 24 challenge packets. Both browser scripts pass syntax checks, and the launcher passes its shell syntax check.
+The working checkout passes **51 Python tests and nine JavaScript tests**. Dataset validation confirms 600 training, 220 validation, 220 test and 24 challenge packets. All three browser scripts pass syntax checks, and the launcher passes its shell syntax check.
 
 The checks cover:
 
@@ -16,6 +16,7 @@ The checks cover:
 - Local sandbox isolation: no hosted Jev calls, input mutation, answer-key reuse or saved-run changes.
 - Family/failure filter selection, empty matches, browser navigation state and delayed-response handling.
 - Explicit separation between a local ML replay and a missing saved or hosted prediction.
+- Study rendering, safe Markdown, local return links, document allowlisting, original source downloads and article routes.
 - Bundle credential rejection, unexpected archive paths, payload checksums and restoration that refuses conflicting evidence or symlink destinations.
 
 Run the checks in [the README](../README.md#checks). Two Python tests require local historical runs: exact saved-request hash matching and saved provider-response export allowlisting. They skip on a fresh clone; the other tests still exercise request construction, secrecy and export routes.
@@ -26,6 +27,8 @@ The browser review covered all eight walkthrough chapters at wide, tablet and ph
 
 The reviewed flows include:
 
+- Formatted study articles at wide, tablet and 390-pixel widths, section navigation, table expansion, exact code copying and readable reference guides.
+- Study return links restoring the selected packet, approach, field, inspection view and chapter; Markdown downloads preserve the source.
 - Four separately stated decisions and a guided tour that starts with the radio scheduler validation case.
 - Narrow-screen chapter selection, family selection, failure filters, empty states and previous/next movement.
 - Evidence, decisions and model inspection, with a separate paired-input view and browser Back restoring the previous case or step.

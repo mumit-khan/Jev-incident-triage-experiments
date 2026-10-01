@@ -319,14 +319,23 @@ def handler_for(study):
                     if kind == 'case':
                         return self.send(200, case)
                     raise ValueError('Unknown export type.')
+                if parsed.path == '/study':
+                    from .study_page import render_study
+                    return self.send(200, render_study(study, params), 'text/html; charset=utf-8')
                 if parsed.path == '/study.md':
-                    path = study.root / 'docs/experiment-overview.md'
+                    from .study_page import DOCUMENTS
+                    document = params.get('doc', 'overview')
+                    if document not in DOCUMENTS:
+                        raise ValueError('Unknown study document.')
+                    path = study.root / DOCUMENTS[document]
                     if path.exists():
                         return self.send(200, path.read_bytes(), 'text/markdown; charset=utf-8')
                 assets = {'/': ('explorer.html', 'text/html; charset=utf-8'),
                           '/explorer': ('explorer.html', 'text/html; charset=utf-8'),
                           '/explorer.js': ('explorer.js', 'text/javascript; charset=utf-8'),
-                          '/explorer.css': ('explorer.css', 'text/css; charset=utf-8')}
+                          '/explorer.css': ('explorer.css', 'text/css; charset=utf-8'),
+                          '/study.css': ('study.css', 'text/css; charset=utf-8'),
+                          '/study.js': ('study.js', 'text/javascript; charset=utf-8')}
                 if parsed.path in assets:
                     name, mime = assets[parsed.path]
                     return self.send(200, (Path(__file__).parent / 'web' / name).read_bytes(), mime)

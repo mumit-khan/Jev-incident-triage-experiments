@@ -4,7 +4,7 @@
 
 I compare hosted Jev, trained ML and rules on incident decisions for the fictional **Northstar Telecom** network. The study examines failures and whether clearer inputs, questions or software calculations improve decisions. It recommends diagnostics without executing network changes.
 
-Two experiments are complete. The app includes an eight-chapter study walkthrough, saved-case inspection, an ML feature microscope and a local evidence sandbox. The next experiment has not run.
+Two experiments are complete. The app includes an eight-chapter study walkthrough, saved-case inspection, an ML feature microscope, a local evidence sandbox and a formatted study reader at `/study`. The reader uses the repository Markdown and preserves the selected walkthrough context. The next experiment has not run.
 
 The current handoff and historical evidence belong to the [`study-evidence-v1` release](https://github.com/mumit/Jev-incident-triage-experiments/releases/tag/study-evidence-v1). Its tag identifies the source version; the bundle manifest records the full source commit. The frozen inference checkpoint is `6a44f62`. Later UI and documentation work preserves its four inference files.
 

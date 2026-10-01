@@ -8,6 +8,8 @@ Start the app as described in [the README](../README.md#start). The current work
 
 Choose **Study walkthrough** and start the guided tour. It begins with radio scheduler case `NS-b073aba91088` from validation. Follow the eight chapters in [the walkthrough guide](observatory.md). In **Case workbench**, read **Evidence**, compare **Decisions**, then open **Inside an approach**. **Paired change** compares the controlled inputs.
 
+**Read study** opens the experiment overview as an article. Use its section navigation, expandable tables and case links to move between the explanation and evidence. **Return to walkthrough** restores your selected case and inspection view; **Download Markdown** provides the source.
+
 The walkthrough reads the fixed saved experiment runs. A fresh clone has no historical run files, so it shows missing results while keeping data inspection and local ML replay available.
 
 ## Run a new comparison
