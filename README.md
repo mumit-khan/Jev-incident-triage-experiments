@@ -21,6 +21,10 @@ The current working session uses [port 8768](http://127.0.0.1:8768/explorer). Li
 
 Startup does not call Jev or download language-model weights. The app fits local classifiers when first needed and reuses them within the server session. Enter a key in **Model settings** to run new hosted Jev comparisons. Hosted calls incur provider charges. Keys entered there stay in server memory; `.env` is an optional ignored configuration file.
 
+## Continue the work
+
+Start with [HANDOFF.md](HANDOFF.md) for the current state, experimental controls and next task. Restore the four historical runs from the [study evidence release](https://github.com/mumit/Jev-incident-triage-experiments/releases/tag/study-evidence-v1) using the [bundle guide](docs/run-bundle.md). The archive stays outside Git history; `runs/` remains ignored.
+
 ## Read and explore
 
 | Document | What it covers |
@@ -33,6 +37,7 @@ Startup does not call Jev or download language-model weights. The app fits local
 | [Policy](docs/policy.md) | The four decisions and fictional priority rules. |
 | [Evaluation plan](docs/evaluation-plan.md) | Scoring, experimental controls and proposed future checks. |
 | [Samples](docs/samples.md) | Input excerpts and separate reference decisions. |
+| [Run bundle](docs/run-bundle.md) | Download, verify and restore historical study evidence. |
 | [Verification](docs/verification.md) | Current tests, browser checks and publication limits. |
 
 In the walkthrough, start the guided tour with the radio scheduler validation case. Move through **Evidence**, **Decisions** and **Inside an approach**. **Paired change** compares controlled inputs. The sandbox changes a copy and runs only rules and the two local ML variants; it does not call Jev or change saved results.
@@ -74,7 +79,7 @@ node --check triage_bench/web/explorer.js
 bash -n start.command
 ```
 
-The working checkout passes 40 Python tests and nine JavaScript tests. Two Python checks depend on historical run files and skip on a fresh clone. See [verification](docs/verification.md) for their scope.
+The working checkout passes 45 Python tests and nine JavaScript tests. Two Python checks depend on historical run files and skip on a fresh clone. See [verification](docs/verification.md) for their scope.
 
 ## References
 

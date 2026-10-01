@@ -15,3 +15,5 @@ Run dataset validation, the unit suite and JavaScript syntax checks after change
 Use the app labels Rules, ML · original, ML · revised, Jev · original and Jev · focused in guides. Keep the user-edited experiment overview and exported Markdown copies aligned. Preserve frozen data and measured results; raw runs and credentials stay ignored. Run the Python suite, dataset validator, both browser-script syntax checks and `node --test tests/explorer-ui.test.cjs` before publishing changes.
 
 Write study narration in first person for authorship, choices, judgments and limitations. Let models, data, methods and results lead descriptions of their behavior. Avoid repeated “I used,” “I trained” or “I will” openings. Preserve completed-versus-planned work and technical qualifications when revising prose.
+
+Keep HANDOFF.md and the historical bundle guide aligned with the study. Historical evidence is a versioned release asset, not tracked run files. Never overwrite an existing run or replace a released bundle with different evidence.

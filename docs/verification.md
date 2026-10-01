@@ -4,7 +4,7 @@ September 30, 2026. This document records the current implementation checks and 
 
 ## Automated checks
 
-The working checkout passes **40 Python tests and nine JavaScript tests**. Dataset validation confirms 600 training, 220 validation, 220 test and 24 challenge packets. Both browser scripts pass syntax checks, and the launcher passes its shell syntax check.
+The working checkout passes **45 Python tests and nine JavaScript tests**. Dataset validation confirms 600 training, 220 validation, 220 test and 24 challenge packets. Both browser scripts pass syntax checks, and the launcher passes its shell syntax check.
 
 The checks cover:
 
@@ -16,6 +16,7 @@ The checks cover:
 - Local sandbox isolation: no hosted Jev calls, input mutation, answer-key reuse or saved-run changes.
 - Family/failure filter selection, empty matches, browser navigation state and delayed-response handling.
 - Explicit separation between a local ML replay and a missing saved or hosted prediction.
+- Bundle credential rejection, unexpected archive paths, payload checksums and restoration that refuses conflicting evidence or symlink destinations.
 
 Run the checks in [the README](../README.md#checks). Two Python tests require local historical runs: exact saved-request hash matching and saved provider-response export allowlisting. They skip on a fresh clone; the other tests still exercise request construction, secrecy and export routes.
 
@@ -48,3 +49,7 @@ The GitHub repository contains source, the synthetic dataset, separate answer ke
 A fresh clone can inspect data and policy, fit local ML, reconstruct local scores and use the sandbox. It cannot show the historical comparisons or confirm historical hashes without the recorded run files. Missing results remain explicit. Newly created app runs do not replace the walkthrough's fixed experiment run IDs.
 
 The checks establish the behavior of this teaching tool. They do not certify scenario realism, diagnostic references, probability calibration, operational reliability or savings.
+
+## Historical evidence release
+
+The `study-evidence-v1` release provides the four documented synthetic runs and freeze record as an archive outside Git history. Its manifest binds the evidence to a source commit, dataset fingerprints and per-file checksums. Metadata paths become repository-relative; prediction rows and returned responses remain unchanged. [The bundle guide](run-bundle.md) explains restoration, and [HANDOFF.md](../HANDOFF.md) describes the next task.
